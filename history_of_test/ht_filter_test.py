@@ -28,7 +28,7 @@ group_3D = np.array([1, 2, 3, 1, 5, 6, 3, 2, 7, 9, 1, 2, 3, 1, 5, 6, 3, 2, 7, 9,
 
 Ts = [1, 2]
 for c in range(chnls):
-    dc = nSx_r * kHard_2
+    dc = nSx_r * kHard_2  # diff from original definition
     T = Ts[c]
     group_3D_c = group_3D[c*dc: (c+1)*dc]
     group_3D[c*dc: (c+1)*dc] = np.where(group_3D_c > T, group_3D_c, 0)
