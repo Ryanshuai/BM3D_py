@@ -20,7 +20,7 @@ def precompute_BM(
     cdef int di, dj, dk, i, j, p, q
     cdef unsigned ddk, k, dn, pq, ind
     cdef float value, sum
-    # for di in range(nHW + 1):
+    # for di in range(nHW + 1):  # TODO
     for di in range(nHW):
         for dj in range(Ns):
             dk = int(di * width + dj) - int(nHW)
