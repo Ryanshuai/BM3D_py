@@ -1,10 +1,13 @@
-import numpy as np
 import math
+import numpy as np
 
 
-def bior_2d_forward(output, lpd, hpd):
-    N = output.shape[0]
+def isPowerOfTwo(n: int):
+    return bool(n & (n - 1) == 0)
 
+
+def bior_2d_forward(output, N, lpd, hpd):
+    assert isPowerOfTwo(N)
     iter_max = int(math.log2(N))
     N_1 = N
     N_2 = N // 2
@@ -12,9 +15,9 @@ def bior_2d_forward(output, lpd, hpd):
     S_2 = S_1 // 2 - 1
     tmp = np.zeros(N_1 + 2 * S_2)
     ind_per = np.zeros(N_1 + 2 * S_2, dtype=np.int)
+    per_ext_ind(ind_per, N_1, S_2)
 
     for iter in range(0, iter_max):
-        per_ext_ind(ind_per, N_1, S_2)
         for i in range(N_1):
             for j in range(len(tmp)):
                 tmp[j] = output[i * N + ind_per[j]]
@@ -40,8 +43,8 @@ def bior_2d_forward(output, lpd, hpd):
                 output[j + i * N] = v_l
                 output[j + (i + N_2) * N] = v_h
 
-        N_1 /= 2
-        N_2 /= 2
+        N_1 //= 2
+        N_2 //= 2
 
 
 def bior15_coef():
@@ -103,16 +106,61 @@ def per_ext_ind(ind_per, N, L):
         k += 1
 
 
-def my_bior_2d_forward(mat):
-    pass
-
-
 if __name__ == '__main__':
+    import cv2
+    import pywt
+    import matplotlib.pyplot as plt
+
+    # input
+    img = pywt.data.camera()
+    # img = img[:64, :64]
+    img = img.astype(np.float64)
+
+    # original way
+    img_flat = img.flatten()
+    N = int(math.sqrt(len(img_flat)))
     lpd, hpd, lpr, hpr = bior15_coef()
+    bior_2d_forward(img_flat, N, lpd, hpd)
+    bior_im_orginal = img_flat.reshape(N, N)
 
-    mat = np.arange(1, 65)
-    # print(mat)
-    bior_2d_forward(mat, lpd, hpd)
-    print(mat)
+    # my way
+    coeffs2 = pywt.dwt2(img, 'bior1.5',)
+    LL, (LH, HL, HH) = coeffs2
 
+    # test diff
+    HH_my = HH[2: -2, 2: -2]
+    HL_my = -HL[2: -2, 2: -2]
+    LH_my = -LH[2: -2, 2: -2]
 
+    # test diff
+    HH_original = bior_im_orginal[256:, 256:]
+    HL_original = bior_im_orginal[:256, 256:]
+    LH_original = bior_im_orginal[256:, :256]
+
+    print('sum diff of HH', np.sum(np.abs(HH_original - HH_my)))
+    print('sum diff of HL', np.sum(np.abs(HL_original - HL_my)))
+    print('sum diff of LH', np.sum(np.abs(LH_original - LH_my)))
+
+    print('max diff of HH', np.max(np.abs(HH_original - HH_my)))
+    print('max diff of HL', np.max(np.abs(HL_original - HL_my)))
+    print('max diff of LH', np.max(np.abs(LH_original - LH_my)))
+
+    print((HL_my[0:5, 0:5]*10).astype(np.int))
+    print((HL_original[0:5, 0:5]*10).astype(np.int))
+
+    # print(np.max(HL_my))
+    # print(np.min(HL_my))
+    # print(np.max(HL_original))
+    # print(np.min(HL_original))
+
+    cv2.imshow('diff of HH', np.abs(HH_original - HH_my))
+    cv2.imshow('diff of HL', np.abs(HL_original - HL_my))
+    cv2.imshow('diff of LH', np.abs(LH_original - LH_my))
+
+    # cv2.imshow('HH_my', HH_my)
+    # cv2.imshow('HH_original', HH_original)
+    # cv2.imshow('HL_my', HL_my)
+    # cv2.imshow('HL_original', HL_original)
+    # cv2.imshow('LH_my', LH_my)
+    # cv2.imshow('LH_original', LH_original)
+    cv2.waitKey()
