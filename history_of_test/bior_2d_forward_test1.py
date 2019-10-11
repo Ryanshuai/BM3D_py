@@ -6,7 +6,7 @@ def isPowerOfTwo(n: int):
     return bool(n & (n - 1) == 0)
 
 
-def bior_2d_forward(output, N, lpd, hpd):
+def original_bior_2d_forward(output, N, lpd, hpd):
     assert isPowerOfTwo(N)
     iter_max = int(math.log2(N))
     N_1 = N
@@ -120,22 +120,27 @@ if __name__ == '__main__':
     img_flat = img.flatten()
     N = int(math.sqrt(len(img_flat)))
     lpd, hpd, lpr, hpr = bior15_coef()
-    bior_2d_forward(img_flat, N, lpd, hpd)
-    bior_im_orginal = img_flat.reshape(N, N)
+    original_bior_2d_forward(img_flat, N, lpd, hpd)
+    original_bior_img = img_flat.reshape(N, N)
 
     # my way
-    coeffs2 = pywt.dwt2(img, 'bior1.5', mode='periodic')
+    coeffs2 = pywt.dwt2(img, 'bior1.5', mode='periodization')
     LL, (LH, HL, HH) = coeffs2
 
     # test diff
-    HH_my = HH[2: -2, 2: -2]
-    HL_my = -HL[2: -2, 2: -2]
-    LH_my = -LH[2: -2, 2: -2]
+    HH_my = HH
+    HL_my = -HL
+    LH_my = -LH
+
+    # # test diff
+    # HH_my = HH[2: -2, 2: -2]
+    # HL_my = -HL[2: -2, 2: -2]
+    # LH_my = -LH[2: -2, 2: -2]
 
     # test diff
-    HH_original = bior_im_orginal[256:, 256:]
-    HL_original = bior_im_orginal[:256, 256:]
-    LH_original = bior_im_orginal[256:, :256]
+    HH_original = original_bior_img[256:, 256:]
+    HL_original = original_bior_img[:256, 256:]
+    LH_original = original_bior_img[256:, :256]
 
     print('sum diff of HH', np.sum(np.abs(HH_original - HH_my)))
     print('sum diff of HL', np.sum(np.abs(HL_original - HL_my)))
