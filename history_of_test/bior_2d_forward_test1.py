@@ -124,7 +124,7 @@ if __name__ == '__main__':
     bior_im_orginal = img_flat.reshape(N, N)
 
     # my way
-    coeffs2 = pywt.dwt2(img, 'bior1.5',)
+    coeffs2 = pywt.dwt2(img, 'bior1.5', mode='periodic')
     LL, (LH, HL, HH) = coeffs2
 
     # test diff
@@ -145,17 +145,14 @@ if __name__ == '__main__':
     print('max diff of HL', np.max(np.abs(HL_original - HL_my)))
     print('max diff of LH', np.max(np.abs(LH_original - LH_my)))
 
-    print((HL_my[0:5, 0:5]*10).astype(np.int))
-    print((HL_original[0:5, 0:5]*10).astype(np.int))
-
     # print(np.max(HL_my))
     # print(np.min(HL_my))
     # print(np.max(HL_original))
     # print(np.min(HL_original))
 
-    cv2.imshow('diff of HH', np.abs(HH_original - HH_my))
-    cv2.imshow('diff of HL', np.abs(HL_original - HL_my))
-    cv2.imshow('diff of LH', np.abs(LH_original - LH_my))
+    cv2.imshow('diff of HH', np.abs(HH_original - HH_my).astype(np.uint8))
+    cv2.imshow('diff of HL', np.abs(HL_original - HL_my).astype(np.uint8))
+    cv2.imshow('diff of LH', np.abs(LH_original - LH_my).astype(np.uint8))
 
     # cv2.imshow('HH_my', HH_my)
     # cv2.imshow('HH_original', HH_original)
