@@ -2,11 +2,20 @@ import math
 import numpy as np
 
 
+def original_bior_2d_forward(img):
+    img_flat = img.flatten()
+    N = int(math.sqrt(len(img_flat)))
+    lpd, hpd, lpr, hpr = bior15_coef()
+    original_bior_2d_forward_(img_flat, N, lpd, hpd)
+    original_bior_img = img_flat.reshape(N, N)
+    return original_bior_img
+
+
 def isPowerOfTwo(n: int):
     return bool(n & (n - 1) == 0)
 
 
-def original_bior_2d_forward(output, N, lpd, hpd):
+def original_bior_2d_forward_(output, N, lpd, hpd):
     assert isPowerOfTwo(N)
     iter_max = int(math.log2(N))
     N_1 = N
@@ -21,6 +30,8 @@ def original_bior_2d_forward(output, N, lpd, hpd):
         for i in range(N_1):
             for j in range(len(tmp)):
                 tmp[j] = output[i * N + ind_per[j]]
+                if iter == 1:
+                    print(j, ind_per[j])
 
             for j in range(N_2):
                 v_l = 0.
@@ -120,7 +131,7 @@ if __name__ == '__main__':
     img_flat = img.flatten()
     N = int(math.sqrt(len(img_flat)))
     lpd, hpd, lpr, hpr = bior15_coef()
-    original_bior_2d_forward(img_flat, N, lpd, hpd)
+    original_bior_2d_forward_(img_flat, N, lpd, hpd)
     original_bior_img = img_flat.reshape(N, N)
 
     # my way
@@ -132,7 +143,7 @@ if __name__ == '__main__':
     HL_my = -HL
     LH_my = -LH
 
-    # # test diff
+    # test diff
     # HH_my = HH[2: -2, 2: -2]
     # HL_my = -HL[2: -2, 2: -2]
     # LH_my = -LH[2: -2, 2: -2]

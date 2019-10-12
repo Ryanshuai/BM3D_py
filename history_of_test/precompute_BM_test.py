@@ -9,23 +9,23 @@ def precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
     row_ind = ind_initialize(height - kHW + 1, nHW, pHW)
     column_ind = ind_initialize(width - kHW + 1, nHW, pHW)
 
-    # for di in range(nHW + 1):  # TODO
-    for di in range(nHW):
+    for di in range(nHW + 1):
+    # for di in range(nHW):
         for dj in range(Ns):
             dk = int(di * width + dj) - int(nHW)
             ddk = di * Ns + dj
             for i in range(nHW, height - nHW):
                 k = i * width + nHW
                 for j in range(nHW, width - nHW):
-                    k += 1
                     diff_table[k] = (img[k + dk] - img[k]) * (img[k + dk] - img[k])
+                    k += 1
             dn = nHW * width + nHW
             value = 0.0
             for p in range(kHW):
                 pq = p * width + dn
                 for q in range(kHW):
-                    pq += 1
                     value += diff_table[pq]
+                    pq += 1
             sum_table[ddk][dn] = value
 
             for j in range(nHW + 1, width - nHW):
@@ -45,8 +45,6 @@ def precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
                 k = i * width + nHW + 1
                 pq = (i + kHW - 1) * width + kHW - 1 + nHW + 1
                 for j in range(nHW + 1, width - nHW):
-                    k += 1
-                    pq += 1
                     sum_table[ddk][k] = \
                         sum_table[ddk][k - 1] \
                         + sum_table[ddk][k - width] \
@@ -55,6 +53,8 @@ def precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
                         - diff_table[pq - kHW] \
                         - diff_table[pq - kHW * width] \
                         + diff_table[pq - kHW - kHW * width]
+                    k += 1
+                    pq += 1
 
     table_distance = np.empty(shape=[0, 2], dtype=np.int)
     for ind_i in row_ind:
@@ -151,7 +151,7 @@ def my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
             sum_table[ddk] = np.matmul(np.matmul(add_mat, diff_table), add_mat.T)
 
     sum_table = sum_table.reshape((Ns * Ns, height * width))
-    sum_table = np.where(sum_table<threshold, sum_table,)
+    sum_table = np.where(sum_table < threshold, sum_table, )
     patch_table = np.zeros((width * height, NHW), dtype=np.int)
     for ind_i in row_ind:
         for ind_j in column_ind:
