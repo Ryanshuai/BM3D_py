@@ -44,11 +44,12 @@ def precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
 
 
 def my2_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
-    margin = np.pad(np.ones((height-2*nHW, width-2*nHW)), ((nHW, nHW), (nHW, nHW)), 'constant', constant_values=(0, 0)).astype(np.uint8)
+    margin = np.pad(np.ones((height - 2 * nHW, width - 2 * nHW)), ((nHW, nHW), (nHW, nHW)), 'constant',
+                    constant_values=(0, 0)).astype(np.uint8)
     for di in range(0, nHW + 1):
         for dj in range(-nHW, nHW + 1):
             t_img = transport_2d_mat(img, right=dj, down=di)
-            diff_table = (t_img - img) * (t_img - img)*margin
+            diff_table = (t_img - img) * (t_img - img) * margin
         return diff_table
 
 
@@ -72,18 +73,15 @@ if __name__ == '__main__':
     aaa = aaa.reshape(wh, wh)
     bbb = my2_precompute_BM(im, width, height, kHW=1, NHW=3, nHW=2, pHW=1, tauMatch=4000)
 
-    print(aaa)
-    print(bbb)
-    diff = aaa.reshape(wh, wh) - bbb
-    print(diff)
+    # print(aaa)
+    # print(bbb)
+    # diff = aaa.reshape(wh, wh) - bbb
+    # print(diff)
 
+    add_mat = get_add_patch_matrix(10, 2, 2)
 
-
-    # add_mat = get_add_patch_matrix(10, 2, 2)
-    #
-    # aaa_sum = np.matmul(np.matmul(add_mat, aaa), add_mat.T)
-    # print(aaa_sum)
-    # bbb_sum = np.matmul(np.matmul(add_mat, bbb), add_mat.T)
-    # print(bbb_sum)
-
-
+    aaa_sum = np.matmul(np.matmul(add_mat, aaa), add_mat.T)
+    print(aaa_sum)
+    bbb_sum = np.matmul(np.matmul(add_mat, bbb), add_mat.T)
+    print(bbb_sum)
+    print(aaa_sum-bbb_sum)
