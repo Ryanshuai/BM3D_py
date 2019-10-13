@@ -111,8 +111,8 @@ def my2_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
 
             # if dj == -2:
             #     return diff_table
-            print(dj)
-            return diff_table
+        print(dj)
+        return diff_table
 
             sum_table[ddk] = np.matmul(np.matmul(add_mat, diff_table), add_mat.T)
     sum_table = np.maximum(sum_table, margin)

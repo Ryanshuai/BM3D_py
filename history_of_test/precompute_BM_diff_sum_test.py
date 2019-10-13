@@ -48,9 +48,9 @@ def my2_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
                     constant_values=(0, 0)).astype(np.uint8)
     for di in range(0, nHW + 1):
         for dj in range(-nHW, nHW + 1):
-            t_img = transport_2d_mat(img, right=dj, down=di)
+            t_img = transport_2d_mat(img, right=-dj, down=-di)
             diff_table = (t_img - img) * (t_img - img) * margin
-        return diff_table
+            return diff_table
 
 
 if __name__ == '__main__':
