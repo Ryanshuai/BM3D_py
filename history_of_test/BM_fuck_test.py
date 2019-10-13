@@ -43,11 +43,6 @@ def precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
                     diff_table[k] = (img[k + dk] - img[k]) * (img[k + dk] - img[k])
                     k += 1
 
-            # if dj == 0:
-            #     return diff_table
-            print(dj)
-            return diff_table
-
             dn = nHW * width + nHW
             value = 0.0
             for p in range(kHW):
@@ -98,24 +93,22 @@ def my2_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
 
     diff_margin = np.pad(np.ones((height - 2 * nHW, width - 2 * nHW)), ((nHW, nHW), (nHW, nHW)), 'constant',
                          constant_values=(0, 0)).astype(np.uint8)
-    margin = np.zeros((Ns * Ns_, height - 2 * nHW, width - 2 * nHW), dtype=np.int)
-    margin = np.pad(margin, ((0, 0), (nHW, nHW), (nHW, nHW)), 'constant',
-                    constant_values=(2 * threshold, 2 * threshold))
+    sum_margin = (1 - diff_margin) * 2 * threshold
 
     # for di in range(-nHW, nHW + 1):
     for di in range(0, nHW + 1):
         for dj in range(-nHW, nHW + 1):
-            ddk = di * Ns + dj - nHW
-            t_img = transport_2d_mat(img, right=dj, down=di)
+            ddk = di * Ns + dj + nHW
+            t_img = transport_2d_mat(img, right=-dj, down=-di)
             diff_table = (img - t_img) * (img - t_img) * diff_margin
 
-            # if dj == -2:
-            #     return diff_table
-        print(dj)
-        return diff_table
-
-            sum_table[ddk] = np.matmul(np.matmul(add_mat, diff_table), add_mat.T)
-    sum_table = np.maximum(sum_table, margin)
+            aaattt = np.matmul(np.matmul(add_mat, diff_table), add_mat.T)
+            sum_table[ddk] = np.matmul(np.matmul(add_mat, diff_table), add_mat.T)+sum_margin
+            if di == 0 and dj == -nHW:
+                print('testetsetsetsetsetsetestsetset')
+                print(diff_table)
+                print(aaattt)
+                print(sum_table[ddk])
     return sum_table
 
 
@@ -136,13 +129,18 @@ if __name__ == '__main__':
 
     # a = precompute_BM(im, width, height, kHW=8, NHW=16, nHW=16, pHW=3, tauMatch=40)
     aaa = precompute_BM(im_flat, width, height, kHW=1, NHW=25, nHW=2, pHW=1, tauMatch=4000)
-    aaa = aaa.reshape(wh, wh)
+    aaa = aaa.reshape(15, wh, wh)
     bbb = my2_precompute_BM(im, width, height, kHW=1, NHW=3, nHW=2, pHW=1, tauMatch=4000)
 
-    print(aaa)
-    print(bbb)
-    diff = aaa.reshape(wh, wh) - bbb
-    print(diff)
+    # print(aaa)
+    # print(bbb)
+    diff = aaa - bbb
+    for aa, bb, di in zip(aaa, bbb, diff):
+        print('-----------------')
+        print(aa)
+        print(bb)
+        print(di)
+        break
 
     # add_mat = get_add_patch_matrix(10, 2, 2)
     #

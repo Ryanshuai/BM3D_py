@@ -149,8 +149,8 @@ def my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
     # for di in range(-nHW, nHW + 1):
     for di in range(0, nHW + 1):
         for dj in range(-nHW, nHW + 1):
-            ddk = di * Ns + dj - nHW
-            t_img = transport_2d_mat(img, right=dj, down=di)
+            ddk = di * Ns + dj + nHW
+            t_img = transport_2d_mat(img, right=-dj, down=-di)
             diff_table = (img - t_img) * (img - t_img) * diff_margin
 
             sum_table[ddk] = np.matmul(np.matmul(add_mat, diff_table), add_mat.T)
@@ -187,7 +187,7 @@ if __name__ == '__main__':
     # a = precompute_BM(im, width, height, kHW=8, NHW=16, nHW=16, pHW=3, tauMatch=40)
     aaa = precompute_BM(im_flat, width, height, kHW=1, NHW=25, nHW=2, pHW=1, tauMatch=4000)
     print('a finish')
-    bbb = my2_precompute_BM(im, width, height, kHW=1, NHW=3, nHW=2, pHW=1, tauMatch=4000)
+    bbb = my_precompute_BM(im, width, height, kHW=1, NHW=3, nHW=2, pHW=1, tauMatch=4000)
     bbb = bbb.reshape(-1, wh * wh)
 
     # for a, b in zip(aaa, bbb):
