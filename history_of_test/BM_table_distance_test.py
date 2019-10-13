@@ -1,26 +1,37 @@
 import numpy as np
 
 
-def precompute_BM(sum_table, width, height, kHW, NHW, nHW, pHW, tauMatch, k_r):
+def precompute_BM(sum_table, width, height, kHW, NHW, nHW, pHW, tauMatch, ind_i, ind_j):
     Ns = 2 * nHW + 1
     threshold = tauMatch * kHW * kHW
 
-    table_distance = np.empty(shape=[0, 3], dtype=np.int)
+    table_distance = np.empty(shape=[0, 5], dtype=np.int)
 
+    k_r = ind_i * width + ind_j
     for dj in range(-nHW, nHW + 1):
         for di in range(nHW + 1):
             if sum_table[dj + nHW + di * Ns][k_r] < threshold:
+
                 pair = np.array([[sum_table[dj + nHW + di * Ns][k_r], k_r + di * width + dj]], dtype=np.int)
-                pair_ = np.array([[sum_table[dj + nHW + di * Ns][k_r], di, dj]], dtype=np.int)
-                print(pair_)
+                pair_ = np.array([[sum_table[dj + nHW + di * Ns][k_r], ind_i, ind_j, di, dj]], dtype=np.int)
+
+                Ns = 2 * nHW + 1
+                Ns_ = nHW + 1
+                sum_table_ = sum_table.reshape((Ns_, Ns, height, width))
+                sum_table_ = sum_table_.transpose((2, 3, 0, 1))                # print('sum_table_value: ', sum_table[dj + nHW + di * Ns][k_r])
+                # print('di: ', di, 'dj:', dj)
+                # print('pi: ', ind_i, 'pj: ', ind_j)
                 table_distance = np.append(table_distance, pair_, axis=0)
+
+                # table_distance = np.append(table_distance, pair, axis=0)
 
         for di in range(-nHW, 0):
             if sum_table[-dj + nHW + (-di) * Ns][k_r] < threshold:
+
                 pair = np.array(
                     [[sum_table[-dj + nHW + (-di) * Ns][k_r + di * width + dj], k_r + di * width + dj]], dtype=np.int)
                 pair_ = np.array(
-                    [[sum_table[-dj + nHW + (-di) * Ns][k_r + di * width + dj], di, dj]], dtype=np.int)
+                    [[sum_table[-dj + nHW + (-di) * Ns][k_r + di * width + dj], ind_i, ind_j, di, dj]], dtype=np.int)
                 table_distance = np.append(table_distance, pair_, axis=0)
     return table_distance
 
@@ -40,7 +51,7 @@ def get_add_patch_matrix(n, nHW, kHW):
     return res_mat
 
 
-def my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch, ind_i, ind_j):
+def my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
     Ns = 2 * nHW + 1
     Ns_ = 2 * nHW + 1
     Ns_ = nHW + 1
@@ -67,11 +78,13 @@ def my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch, ind_i, in
     sum_table_ = sum_table_.transpose((1, 0))  # ph_pw, di_dj
     sum_filter = np.where(sum_table_ < threshold, 1, 0)
     argsort = np.argpartition(sum_table_, (0, NHW))  # pah_paw --> pbh_pbw
-    argsort = argsort[:, :NHW]
-    argsort = argsort - np.arange(argsort.shape[1]).reshape(1, argsort.shape[1])  # pah_paw --> pbh_pbw
+    # argsort = argsort.reshape((height, width, Ns_, Ns))
+
+    # argsort = argsort[:, :NHW]
+    # argsort = argsort - np.arange(argsort.shape[1]).reshape(1, argsort.shape[1])  # pah_paw --> pbh_pbw
 
     # return argsort.transpose((1, 0))
-    return argsort
+    return sum_table_.reshape((height, width, Ns_, Ns))
 
 
 def transport_2d_mat(mat, right, down):
@@ -81,16 +94,27 @@ def transport_2d_mat(mat, right, down):
     return t_img
 
 
+def ind_initialize(max_size, N, step):
+    ind_set = np.empty(shape=[0], dtype=np.int)
+    ind = N
+    while (ind < max_size - N):
+        ind_set = np.append(ind_set, np.array([ind]), axis=0)
+        ind += step
+    if ind_set[-1] < max_size - N - 1:
+        ind_set = np.append(ind_set, np.array([max_size - N - 1]), axis=0)
+    return ind_set
+
+
 if __name__ == '__main__':
     import cv2
     from history_of_test.BM_diff_sum_test import precompute_BM_sum_table
 
-    im = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
-    wh = 50
-    img = im[:wh, :wh]
-    height, width = im.shape[0], im.shape[1]
+    img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
+    wh = 10
+    img = img[:wh, :wh]
+    height, width = img.shape[0], img.shape[1]
 
-    im_flat = im.flatten()
+    im_flat = img.flatten()
 
     kHW = 1
     NHW = 9
@@ -100,7 +124,17 @@ if __name__ == '__main__':
 
     sum_table = precompute_BM_sum_table(img, width, height, kHW, NHW, nHW, pHW, tauMatch)
 
-    for k_r in range(10000):
-        table_distance = precompute_BM(sum_table, width, height, kHW=1, NHW=9, nHW=2, pHW=1, tauMatch=4000, k_r=k_r)
-    print('1111111111111111')
-    print(table_distance)
+    print(sum_table)
+    row_ind = ind_initialize(height - kHW + 1, nHW, pHW)
+    column_ind = ind_initialize(width - kHW + 1, nHW, pHW)
+
+    for ind_i in row_ind:
+        for ind_j in column_ind:
+            table_distance = precompute_BM(sum_table, width, height, kHW, NHW, nHW, pHW, tauMatch, ind_i, ind_j)
+            print(table_distance)
+            break
+        break
+    td = my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch)
+    print(td[2, 2])
+
+

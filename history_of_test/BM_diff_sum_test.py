@@ -108,7 +108,7 @@ def precompute_BM_sum_table(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
     argsort = np.argpartition(sum_table_, (0, NHW))  # pah_paw --> pbh_pbw
     argsort = argsort - np.arange(argsort.shape[1]).reshape(1, argsort.shape[1])  # pah_paw --> pbh_pbw
 
-    return sum_table
+    return sum_table.reshape((Ns * Ns_, height * width))
 
 
 def transport_2d_mat(mat, right, down):
