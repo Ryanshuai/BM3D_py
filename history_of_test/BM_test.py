@@ -73,6 +73,7 @@ def precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
                             [[sum_table[-dj + nHW + (-di) * Ns][k_r + di * width + dj], k_r + di * width + dj]],
                             dtype=np.int)
                         table_distance = np.append(table_distance, pair, axis=0)
+            return table_distance
 
             nSx_r = closest_power_of_2(len(table_distance) * 2) if NHW > len(
                 table_distance) * 2 else NHW
@@ -92,7 +93,7 @@ def precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
             if nSx_r == 1:
                 patch_table[k_r][0] = table_distance[0][1]
 
-    return sum_table
+    return patch_table
 
 
 def closest_power_of_2(n):
@@ -142,9 +143,7 @@ def my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
 
     diff_margin = np.pad(np.ones((height - 2 * nHW, width - 2 * nHW)), ((nHW, nHW), (nHW, nHW)), 'constant',
                          constant_values=(0, 0)).astype(np.uint8)
-    margin = np.zeros((Ns * Ns_, height - 2 * nHW, width - 2 * nHW), dtype=np.int)
-    margin = np.pad(margin, ((0, 0), (nHW, nHW), (nHW, nHW)), 'constant',
-                    constant_values=(2 * threshold, 2 * threshold))
+    sum_margin = (1 - diff_margin) * 2 * threshold
 
     # for di in range(-nHW, nHW + 1):
     for di in range(0, nHW + 1):
@@ -153,16 +152,18 @@ def my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
             t_img = transport_2d_mat(img, right=-dj, down=-di)
             diff_table = (img - t_img) * (img - t_img) * diff_margin
 
-            sum_table[ddk] = np.matmul(np.matmul(add_mat, diff_table), add_mat.T)
-    sum_table = np.maximum(sum_table, margin)
+            sum_t = np.matmul(np.matmul(add_mat, diff_table), add_mat.T)
+            sum_table[ddk] = np.maximum(sum_t, sum_margin)
 
     sum_table_ = sum_table.reshape((Ns * Ns_, height * width))  # di_dj, ph_pw
     sum_table_ = sum_table_.transpose((1, 0))  # ph_pw, di_dj
     sum_filter = np.where(sum_table_ < threshold, 1, 0)
     argsort = np.argpartition(sum_table_, (0, NHW))  # pah_paw --> pbh_pbw
+    argsort = argsort[:, :NHW]
     argsort = argsort - np.arange(argsort.shape[1]).reshape(1, argsort.shape[1])  # pah_paw --> pbh_pbw
 
-    return sum_table
+    # return argsort.transpose((1, 0))
+    return argsort
 
 
 def transport_2d_mat(mat, right, down):
@@ -176,24 +177,30 @@ if __name__ == '__main__':
     import cv2
 
     im = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
-    wh = 10
+    wh = 20
     im = im[:wh, :wh]
 
-    # im = np.zeros_like(im)
+    im = np.zeros_like(im)
     height, width = im.shape[0], im.shape[1]
 
     im_flat = im.flatten()
 
     # a = precompute_BM(im, width, height, kHW=8, NHW=16, nHW=16, pHW=3, tauMatch=40)
-    aaa = precompute_BM(im_flat, width, height, kHW=1, NHW=25, nHW=2, pHW=1, tauMatch=4000)
-    print('a finish')
-    bbb = my_precompute_BM(im, width, height, kHW=1, NHW=3, nHW=2, pHW=1, tauMatch=4000)
-    bbb = bbb.reshape(-1, wh * wh)
+    aaa = precompute_BM(im_flat, width, height, kHW=1, NHW=9, nHW=2, pHW=1, tauMatch=4000)
+    bbb = my_precompute_BM(im, width, height, kHW=1, NHW=9, nHW=2, pHW=1, tauMatch=4000)
+
+    print(aaa)
+    # for b in bbb:
+    #     print(b)
 
     # for a, b in zip(aaa, bbb):
-    #     print(a.reshape(wh, wh))
-    #     print(b.reshape(wh, wh))
+    #     # print(a.reshape(wh, wh))
+    #     # print(b.reshape(wh, wh))
+    #     print('----------------')
+    #     print(a)
+    #     print(b)
+    #
+    # diff = aaa - bbb
+    # for line in diff:
+    #     print(line.reshape(wh, wh))
 
-    diff = aaa - bbb
-    for line in diff:
-        print(line.reshape(wh, wh))
