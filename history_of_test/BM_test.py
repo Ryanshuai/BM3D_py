@@ -129,15 +129,11 @@ def get_add_patch_matrix(n, nHW, kHW):
     return res_mat
 
 
-def my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
+def my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch, Pr):
     Ns = 2 * nHW + 1
     threshold = tauMatch * kHW * kHW
     sum_table = np.ones((Ns * Ns, height, width), dtype=np.int) * 2 * threshold  # di*width+dj, ph, pw
-
-    row_ind = ind_initialize(height - kHW + 1, nHW, pHW)
-    column_ind = ind_initialize(width - kHW + 1, nHW, pHW)  # TODO
     add_mat = get_add_patch_matrix(width, nHW, kHW)
-
     diff_margin = np.pad(np.ones((height - 2 * nHW, width - 2 * nHW)), ((nHW, nHW), (nHW, nHW)), 'constant',
                          constant_values=(0, 0)).astype(np.uint8)
     sum_margin = (1 - diff_margin) * 2 * threshold
@@ -153,21 +149,22 @@ def my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
 
     sum_table = sum_table.reshape((Ns * Ns, height * width))  # di_dj, ph_pw
     sum_table_T = sum_table.transpose((1, 0))  # ph_pw__di_dj
-    print(sum_table_T[22].reshape(Ns, Ns))
+    # print(sum_table_T[22].reshape(Ns, Ns))
     argsort = np.argsort(sum_table_T, axis=1)
-    argsort_di = argsort // (Ns) - 2
-    argsort_dj = argsort % (Ns) - 2
-
-    pos_r__p_near = argsort_di * width + argsort_dj
-    pos_r__pos_near = pos_r__p_near + np.arange(pos_r__p_near.shape[0]).reshape((pos_r__p_near.shape[0], 1))
-
-    # for ag, di, dj, posr, pr in zip(argsort[22], argsort_di[22], argsort_dj[22], pos_r__p_near[22], pos_r__pos_near[22]):
-    #     print(ag, '\t', di, '\t', dj, '\t', posr, '\t', pr)
-
+    argsort_di = argsort // (Ns) - nHW
+    argsort_dj = argsort % (Ns) - nHW
+    Pr_S__Vnear = argsort_di * width + argsort_dj
+    Pr_S__Pnear = Pr_S__Vnear + np.arange(Pr_S__Vnear.shape[0]).reshape((Pr_S__Vnear.shape[0], 1))
+    Pr_N__Pnear = Pr_S__Pnear[:, :NHW]
+    # for test
+    nn = Pr
+    for ag, di, dj, posr, pr in zip(argsort[nn], argsort_di[nn], argsort_dj[nn], Pr_S__Vnear[nn], Pr_S__Pnear[nn]):
+        print(ag, '\t', di, '\t', dj, '\t', posr, '\t', pr)
+    # for test
     sum_filter = np.where(sum_table_T < threshold, 1, 0)
     threshold_count = np.sum(sum_filter, axis=1)
 
-    return pos_r__pos_near, threshold_count
+    return Pr_N__Pnear, threshold_count
 
 
 def transport_2d_mat(mat, right, down):
@@ -181,9 +178,11 @@ if __name__ == '__main__':
     import cv2
 
     im = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
-    wh = 10
-    im = im[:wh, :wh]
-    print(im)
+    im_w = im.shape[1]
+    ref_y, ref_x = 100, 100
+    Pr = ref_y * im_w + ref_x
+    nHW = 2
+    print(im[ref_y - nHW:ref_y + nHW + 1, ref_x - nHW:ref_x + nHW + 1])
 
     # im = np.zeros_like(im)
     height, width = im.shape[0], im.shape[1]
@@ -191,8 +190,8 @@ if __name__ == '__main__':
     im_flat = im.flatten()
 
     # a = precompute_BM(im, width, height, kHW=8, NHW=16, nHW=16, pHW=3, tauMatch=40)
-    aaa = precompute_BM(im_flat, width, height, kHW=1, NHW=9, nHW=2, pHW=1, tauMatch=10)
-    bbb = my_precompute_BM(im, width, height, kHW=1, NHW=9, nHW=2, pHW=1, tauMatch=10)
+    aaa = precompute_BM(im_flat, width, height, kHW=1, NHW=9, nHW=nHW, pHW=1, tauMatch=10)
+    bbb = my_precompute_BM(im, width, height, kHW=1, NHW=9, nHW=nHW, pHW=1, tauMatch=10, Pr=Pr)
     bbb = bbb[0]
     # print(aaa)
     # print(bbb[0])
