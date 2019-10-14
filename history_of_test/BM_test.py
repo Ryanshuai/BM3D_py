@@ -131,9 +131,8 @@ def get_add_patch_matrix(n, nHW, kHW):
 
 def my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
     Ns = 2 * nHW + 1
-    Ns_ = 2 * nHW + 1
     threshold = tauMatch * kHW * kHW
-    sum_table = np.ones((Ns * Ns_, height, width), dtype=np.int) * 2 * threshold  # di*width+dj, ph, pw
+    sum_table = np.ones((Ns * Ns, height, width), dtype=np.int) * 2 * threshold  # di*width+dj, ph, pw
 
     row_ind = ind_initialize(height - kHW + 1, nHW, pHW)
     column_ind = ind_initialize(width - kHW + 1, nHW, pHW)  # TODO
@@ -152,17 +151,23 @@ def my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
             sum_t = np.matmul(np.matmul(add_mat, diff_table), add_mat.T)
             sum_table[ddk] = np.maximum(sum_t, sum_margin)
 
-    sum_table = sum_table.reshape((Ns * Ns_, height * width))  # di_dj, ph_pw
-    sum_table_T = sum_table.transpose((1, 0))  # ph_pw, di_dj
-    # test_point_sum_table_T = sum_table_T[22].reshape(Ns, Ns_)
-    # print(test_point_sum_table_T)
-    argsort = np.argsort(sum_table_T, axis=1) - (nHW * width + nHW)
-    pr__pnear = argsort + np.arange(argsort.shape[0]).reshape((argsort.shape[0], 1))
+    sum_table = sum_table.reshape((Ns * Ns, height * width))  # di_dj, ph_pw
+    sum_table_T = sum_table.transpose((1, 0))  # ph_pw__di_dj
+    print(sum_table_T[22].reshape(Ns, Ns))
+    argsort = np.argsort(sum_table_T, axis=1)
+    argsort_di = argsort // (Ns) - 2
+    argsort_dj = argsort % (Ns) - 2
 
-    # sum_filter = np.where(sum_table_T < threshold, 1, 0)
-    # threshold_count = np.sum(sum_filter, axis=1)
+    pos_r__p_near = argsort_di * width + argsort_dj
+    pos_r__pos_near = pos_r__p_near + np.arange(pos_r__p_near.shape[0]).reshape((pos_r__p_near.shape[0], 1))
 
-    return pr__pnear, threshold_count
+    # for ag, di, dj, posr, pr in zip(argsort[22], argsort_di[22], argsort_dj[22], pos_r__p_near[22], pos_r__pos_near[22]):
+    #     print(ag, '\t', di, '\t', dj, '\t', posr, '\t', pr)
+
+    sum_filter = np.where(sum_table_T < threshold, 1, 0)
+    threshold_count = np.sum(sum_filter, axis=1)
+
+    return pos_r__pos_near, threshold_count
 
 
 def transport_2d_mat(mat, right, down):
@@ -186,8 +191,8 @@ if __name__ == '__main__':
     im_flat = im.flatten()
 
     # a = precompute_BM(im, width, height, kHW=8, NHW=16, nHW=16, pHW=3, tauMatch=40)
-    aaa = precompute_BM(im_flat, width, height, kHW=2, NHW=9, nHW=2, pHW=1, tauMatch=4000)
-    bbb = my_precompute_BM(im, width, height, kHW=2, NHW=9, nHW=2, pHW=1, tauMatch=4000)
+    aaa = precompute_BM(im_flat, width, height, kHW=1, NHW=9, nHW=2, pHW=1, tauMatch=10)
+    bbb = my_precompute_BM(im, width, height, kHW=1, NHW=9, nHW=2, pHW=1, tauMatch=10)
     bbb = bbb[0]
     # print(aaa)
     # print(bbb[0])
