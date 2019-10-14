@@ -55,16 +55,18 @@ def precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
                     k += 1
                     pq += 1
 
-    table_distance = np.empty(shape=[0, 2], dtype=np.int)
     patch_table = np.zeros((width * height, NHW), dtype=np.int)
     for ind_i in row_ind:
         for ind_j in column_ind:
             k_r = ind_i * width + ind_j
+            table_distance = np.empty(shape=[0, 2], dtype=np.int)
 
             for dj in range(-nHW, nHW + 1):
                 for di in range(nHW + 1):
                     if sum_table[dj + nHW + di * Ns][k_r] < threshold:
                         pair = np.array([[sum_table[dj + nHW + di * Ns][k_r], k_r + di * width + dj]], dtype=np.int)
+                        # print(k_r)
+                        # print(k_r + di * width + dj)
                         table_distance = np.append(table_distance, pair, axis=0)
 
                 for di in range(-nHW, 0):
@@ -73,19 +75,17 @@ def precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
                             [[sum_table[-dj + nHW + (-di) * Ns][k_r + di * width + dj], k_r + di * width + dj]],
                             dtype=np.int)
                         table_distance = np.append(table_distance, pair, axis=0)
-            return table_distance
 
             nSx_r = closest_power_of_2(len(table_distance) * 2) if NHW > len(
                 table_distance) * 2 else NHW
 
             if nSx_r == 1 and len(table_distance) * 2 == 0:
-                print('problem size')
                 pair = np.array([[0, k_r]], dtype=np.int)
                 table_distance = np.append(table_distance, pair, axis=0)
 
             # partial_sort(table_distance.begin(), table_distance.begin() + nSx_r,
             #                               table_distance.end(), ComparaisonFirst);
-            sorted(table_distance, key=lambda x: x[0], )
+            sorted(table_distance, key=lambda x: x[0], )  # TODO some problem， seems like it dose not work
 
             for n in range(nSx_r):
                 patch_table[k_r][n] = table_distance[n][1]
@@ -132,38 +132,37 @@ def get_add_patch_matrix(n, nHW, kHW):
 def my_precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
     Ns = 2 * nHW + 1
     Ns_ = 2 * nHW + 1
-    Ns_ = nHW + 1
     threshold = tauMatch * kHW * kHW
     sum_table = np.ones((Ns * Ns_, height, width), dtype=np.int) * 2 * threshold  # di*width+dj, ph, pw
 
     row_ind = ind_initialize(height - kHW + 1, nHW, pHW)
-    column_ind = ind_initialize(width - kHW + 1, nHW, pHW)
+    column_ind = ind_initialize(width - kHW + 1, nHW, pHW)  # TODO
     add_mat = get_add_patch_matrix(width, nHW, kHW)
-
 
     diff_margin = np.pad(np.ones((height - 2 * nHW, width - 2 * nHW)), ((nHW, nHW), (nHW, nHW)), 'constant',
                          constant_values=(0, 0)).astype(np.uint8)
     sum_margin = (1 - diff_margin) * 2 * threshold
 
-    # for di in range(-nHW, nHW + 1):
-    for di in range(0, nHW + 1):
+    for di in range(-nHW, nHW + 1):
         for dj in range(-nHW, nHW + 1):
-            ddk = di * Ns + dj + nHW
+            ddk = (di + nHW) * Ns + dj + nHW
             t_img = transport_2d_mat(img, right=-dj, down=-di)
             diff_table = (img - t_img) * (img - t_img) * diff_margin
 
             sum_t = np.matmul(np.matmul(add_mat, diff_table), add_mat.T)
             sum_table[ddk] = np.maximum(sum_t, sum_margin)
 
-    sum_table_ = sum_table.reshape((Ns * Ns_, height * width))  # di_dj, ph_pw
-    sum_table_ = sum_table_.transpose((1, 0))  # ph_pw, di_dj
-    sum_filter = np.where(sum_table_ < threshold, 1, 0)
-    argsort = np.argpartition(sum_table_, (0, NHW))  # pah_paw --> pbh_pbw
-    argsort = argsort[:, :NHW]
-    argsort = argsort - np.arange(argsort.shape[1]).reshape(1, argsort.shape[1])  # pah_paw --> pbh_pbw
+    sum_table = sum_table.reshape((Ns * Ns_, height * width))  # di_dj, ph_pw
+    sum_table_T = sum_table.transpose((1, 0))  # ph_pw, di_dj
+    # test_point_sum_table_T = sum_table_T[22].reshape(Ns, Ns_)
+    # print(test_point_sum_table_T)
+    argsort = np.argsort(sum_table_T, axis=1) - (nHW * width + nHW)
+    pr__pnear = argsort + np.arange(argsort.shape[0]).reshape((argsort.shape[0], 1))
 
-    # return argsort.transpose((1, 0))
-    return argsort
+    # sum_filter = np.where(sum_table_T < threshold, 1, 0)
+    # threshold_count = np.sum(sum_filter, axis=1)
+
+    return pr__pnear, threshold_count
 
 
 def transport_2d_mat(mat, right, down):
@@ -177,30 +176,31 @@ if __name__ == '__main__':
     import cv2
 
     im = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
-    wh = 20
+    wh = 10
     im = im[:wh, :wh]
+    print(im)
 
-    im = np.zeros_like(im)
+    # im = np.zeros_like(im)
     height, width = im.shape[0], im.shape[1]
 
     im_flat = im.flatten()
 
     # a = precompute_BM(im, width, height, kHW=8, NHW=16, nHW=16, pHW=3, tauMatch=40)
-    aaa = precompute_BM(im_flat, width, height, kHW=1, NHW=9, nHW=2, pHW=1, tauMatch=4000)
-    bbb = my_precompute_BM(im, width, height, kHW=1, NHW=9, nHW=2, pHW=1, tauMatch=4000)
-
-    print(aaa)
+    aaa = precompute_BM(im_flat, width, height, kHW=2, NHW=9, nHW=2, pHW=1, tauMatch=4000)
+    bbb = my_precompute_BM(im, width, height, kHW=2, NHW=9, nHW=2, pHW=1, tauMatch=4000)
+    bbb = bbb[0]
+    # print(aaa)
+    # print(bbb[0])
     # for b in bbb:
     #     print(b)
 
-    # for a, b in zip(aaa, bbb):
-    #     # print(a.reshape(wh, wh))
-    #     # print(b.reshape(wh, wh))
-    #     print('----------------')
-    #     print(a)
-    #     print(b)
+    for a, b in zip(aaa, bbb):
+        # print(a.reshape(wh, wh))
+        # print(b.reshape(wh, wh))
+        print('----------------')
+        print(a)
+        print(b)
     #
     # diff = aaa - bbb
     # for line in diff:
     #     print(line.reshape(wh, wh))
-
