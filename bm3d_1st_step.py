@@ -1,6 +1,6 @@
 import numpy as np
 from preProcess import preProcess
-from precompute_bm import precompute_BM
+from precompute_BM import precompute_BM
 from bior_2d import bior_2d_forward
 
 
