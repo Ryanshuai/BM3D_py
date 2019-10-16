@@ -1,11 +1,10 @@
 import numpy as np
 
 
-def transport_2d_mat(mat, right, down):
-    rows, cols = mat.shape
-    t_M = np.float32([[1, 0, right], [0, 1, down]])
-    t_img = cv2.warpAffine(mat, t_M, (cols, rows))
-    return t_img
+def translation_2d_mat(mat, right, down):
+    mat = np.roll(mat, right, axis=1)
+    mat = np.roll(mat, down, axis=0)
+    return mat
 
 
 def get_add_patch_matrix(n, nHW, kHW):
