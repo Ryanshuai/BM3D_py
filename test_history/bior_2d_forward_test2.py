@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from history_of_test.bior_2d_forward_test1 import original_bior_2d_forward, bior15_coef
+from test_history.bior_2d_forward_test1 import original_bior_2d_forward, bior15_coef
 
 
 def bior_2d_forward(img):

@@ -71,13 +71,13 @@ if __name__ == '__main__':
     kHW, NHW, nHW, tauMatch = 8, 10, 16, 1000
     Pr_N__Pnear, threshold_count = my_precompute_BM(im, kHW=kHW, NHW=NHW, nHW=nHW, tauMatch=tauMatch)
 
-    ref_y, ref_x = 100, 100
-    Pr = ref_y * im_w + ref_x
+    ref_i, ref_j = 100, 100
+    Pr = ref_i * im_w + ref_j
 
     im = cv2.cvtColor(im, cv2.COLOR_GRAY2RGB)
-    cv2.rectangle(im, (ref_x, ref_y), (ref_x + kHW, ref_y + kHW), color=(255, 0, 0), thickness=1)
-    points_list = [(ref_x - nHW, ref_y - nHW), (ref_x + nHW, ref_y - nHW), (ref_x - nHW, ref_y + nHW),
-                   (ref_x + nHW, ref_y + nHW)]
+    cv2.rectangle(im, (ref_j, ref_i), (ref_j + kHW, ref_i + kHW), color=(255, 0, 0), thickness=1)
+    points_list = [(ref_j - nHW, ref_i - nHW), (ref_j + nHW, ref_i - nHW), (ref_j - nHW, ref_i + nHW),
+                   (ref_j + nHW, ref_i + nHW)]
     for point in points_list:
         cv2.circle(im, point, 0, (0, 0, 255), 1)
 

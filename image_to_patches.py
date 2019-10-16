@@ -13,11 +13,12 @@ def get_transport_mat(im_s, k):
     return Trans
 
 
-def image2patches(im, k):
+def image2patches(im, k, p):
     '''
     :param im:
     :param k: patch size
-    :return: all patches in image
+    :param p: step TODO
+    :return:
     '''
     assert im.ndim == 2
     assert im.shape[0] == im.shape[1]
@@ -42,9 +43,9 @@ if __name__ == '__main__':
         im[i, i + 150] = 0
     cv2.imshow('im', im)
 
-    k = 20
+    k = 8
     res = image2patches(im, k)
-    for i in range(res.shape[0]):
-        for j in range(res.shape[1]):
-            cv2.imshow('patches', res[i, j].astype(np.uint8))
-            cv2.waitKey(100)
+    # for i in range(res.shape[0]):
+    #     for j in range(res.shape[1]):
+    #         cv2.imshow('patches', res[i, j].astype(np.uint8))
+    #         cv2.waitKey(100)

@@ -104,7 +104,7 @@ def ind_initialize(max_size, N, step):
 
 if __name__ == '__main__':
     import cv2
-    from history_of_test.BM_diff_sum_test import precompute_BM_sum_table
+    from test_history.BM_diff_sum_test import precompute_BM_sum_table
 
     img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
     wh = 10
