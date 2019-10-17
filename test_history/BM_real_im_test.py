@@ -46,6 +46,7 @@ def my_precompute_BM(img, kHW, NHW, nHW, tauMatch):
     Pr_S__Vnear = argsort_di * width + argsort_dj
     Pr_S__Pnear = Pr_S__Vnear + np.arange(Pr_S__Vnear.shape[0]).reshape((Pr_S__Vnear.shape[0], 1))
     Pr_N__Pnear = Pr_S__Pnear[:, :NHW]
+    Pr_N__Pnear = Pr_N__Pnear.reshape((height, width, NHW))
     # for test
     # nn = 22
     # for ag, di, dj, posr, pr in zip(argsort[nn], argsort_di[nn], argsort_dj[nn], Pr_S__Vnear[nn], Pr_S__Pnear[nn]):
@@ -53,6 +54,7 @@ def my_precompute_BM(img, kHW, NHW, nHW, tauMatch):
     # for test
     sum_filter = np.where(sum_table_T < threshold, 1, 0)
     threshold_count = np.sum(sum_filter, axis=1)
+    threshold_count = threshold_count.reshape((height, width))
 
     return Pr_N__Pnear, threshold_count
     # return Pr_N__Pnear, sum_table_T, argsort_di, argsort_dj, threshold_count
@@ -71,8 +73,8 @@ if __name__ == '__main__':
     kHW, NHW, nHW, tauMatch = 8, 10, 16, 1000
     Pr_N__Pnear, threshold_count = my_precompute_BM(im, kHW=kHW, NHW=NHW, nHW=nHW, tauMatch=tauMatch)
 
-    ref_i, ref_j = 100, 100
-    Pr = ref_i * im_w + ref_j
+    ref_i, ref_j = 180, 128
+    # Pr = ref_i * im_w + ref_j
 
     im = cv2.cvtColor(im, cv2.COLOR_GRAY2RGB)
     cv2.rectangle(im, (ref_j, ref_i), (ref_j + kHW, ref_i + kHW), color=(255, 0, 0), thickness=1)
@@ -81,8 +83,8 @@ if __name__ == '__main__':
     for point in points_list:
         cv2.circle(im, point, 0, (0, 0, 255), 1)
 
-    count = threshold_count[Pr]
-    for i, Pnear in enumerate(Pr_N__Pnear[Pr]):
+    count = threshold_count[ref_i, ref_j]
+    for i, Pnear in enumerate(Pr_N__Pnear[ref_i, ref_j]):
         if i == 0:
             continue
         if i > count:

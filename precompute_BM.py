@@ -45,10 +45,12 @@ def precompute_BM(img, kHW, NHW, nHW, tauMatch):
     Pr_S__Vnear = argsort_di * width + argsort_dj
     Pr_S__Pnear = Pr_S__Vnear + np.arange(Pr_S__Vnear.shape[0]).reshape((Pr_S__Vnear.shape[0], 1))
     Pr_N__Pnear = Pr_S__Pnear[:, :NHW]
+    Ir_Jr_N__Pnear = Pr_N__Pnear.reshape((height, width, NHW))
     sum_filter = np.where(sum_table_T < threshold, 1, 0)
     threshold_count = np.sum(sum_filter, axis=1)
+    threshold_count = threshold_count.reshape((height, width))
 
-    return Pr_N__Pnear, threshold_count
+    return Ir_Jr_N__Pnear, threshold_count
 
 
 def translation_2d_mat(mat, right, down):
