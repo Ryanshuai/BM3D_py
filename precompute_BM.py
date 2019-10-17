@@ -48,6 +48,7 @@ def precompute_BM(img, kHW, NHW, nHW, tauMatch):
     Ir_Jr_N__Pnear = Pr_N__Pnear.reshape((height, width, NHW))
     sum_filter = np.where(sum_table_T < threshold, 1, 0)
     threshold_count = np.sum(sum_filter, axis=1)
+    threshold_count = np.where(threshold_count <= NHW, threshold_count, NHW)
     threshold_count = threshold_count.reshape((height, width))
 
     return Ir_Jr_N__Pnear, threshold_count

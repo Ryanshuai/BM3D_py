@@ -8,7 +8,7 @@ def symetrize(img, N):
 
 def add_gaussian_noise(im, sigma):
     im_h, im_w = im.shape
-    im += sigma * np.random.randn(im_h, im_w)
+    im = im + (sigma * np.random.randn(im_h, im_w)).astype(np.int)
     im = np.clip(im, 0, 255, out=None)
     im = im.astype(np.uint8)
     return im

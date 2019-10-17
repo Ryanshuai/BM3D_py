@@ -26,9 +26,9 @@ def image2patches(im, k, p):
 
     Trans = get_transport_mat(im_s, k)
     repetition = Trans.T @ im @ Trans
-    print(repetition)
     repetition = repetition.reshape((im_s - k + 1, k, im_s - k + 1, k))
     repetition = repetition.transpose((0, 2, 1, 3))
+    repetition = repetition.reshape((-1, k, k))
     return repetition
 
 

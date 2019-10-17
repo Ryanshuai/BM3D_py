@@ -12,12 +12,12 @@ def preProcess(kHW):
         kaiserWindow[2 + kHW * 0] = 0.3846; kaiserWindow[2 + kHW * 1] = 0.5974; kaiserWindow[2 + kHW * 2] = 0.7688; kaiserWindow[2 + kHW * 3] = 0.8644
         kaiserWindow[3 + kHW * 0] = 0.4325; kaiserWindow[3 + kHW * 1] = 0.6717; kaiserWindow[3 + kHW * 2] = 0.8644; kaiserWindow[3 + kHW * 3] = 0.9718
 
-        for i in range(kHW/2):
-            for j in range(kHW/2, kHW):
+        for i in range(kHW//2):
+            for j in range(kHW//2, kHW):
                 kaiserWindow[i + kHW * j] = kaiserWindow[i + kHW * (kHW - j - 1)]
 
-        for i in range(kHW/2, kHW):
-            for j in range(kHW/2):
+        for i in range(kHW//2, kHW):
+            for j in range(kHW//2):
                 kaiserWindow[i + kHW * j] = kaiserWindow[kHW - i - 1 + kHW * j]
 
     elif kHW == 12:
@@ -28,12 +28,12 @@ def preProcess(kHW):
         kaiserWindow[4 + kHW * 0] = 0.4163; kaiserWindow[4 + kHW * 1] = 0.5657; kaiserWindow[4 + kHW * 2] = 0.7033; kaiserWindow[4 + kHW * 3] = 0.8181;  kaiserWindow[4 + kHW * 4] = 0.9005;  kaiserWindow[4 + kHW * 5] = 0.9435
         kaiserWindow[5 + kHW * 0] = 0.4362; kaiserWindow[5 + kHW * 1] = 0.5927; kaiserWindow[5 + kHW * 2] = 0.7369; kaiserWindow[5 + kHW * 3] = 0.8572;  kaiserWindow[5 + kHW * 4] = 0.9435;  kaiserWindow[5 + kHW * 5] = 0.9885
 
-        for i in range(kHW/2):
-            for j in range(kHW/2, kHW):
+        for i in range(kHW//2):
+            for j in range(kHW//2, kHW):
                 kaiserWindow[i + kHW * j] = kaiserWindow[i + kHW * (kHW - j - 1)]
 
-        for i in range(kHW/2, kHW):
-            for j in range(kHW/2):
+        for i in range(kHW//2, kHW):
+            for j in range(kHW//2):
                 kaiserWindow[i + kHW * j] = kaiserWindow[kHW - i - 1 + kHW * j]
 
     else:
