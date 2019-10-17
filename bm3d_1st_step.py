@@ -21,7 +21,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
     column_ind = ind_initialize(width - kHard + 1, nHard, pHard)
 
     kaiserWindow, coef_norm, coef_norm_inv = preProcess(kHard)
-    Ir_Jr_N__Pnear, threshold_count = precompute_BM(img_noisy, kHW=kHard, NHW=NHard, nHW=nHard, tauMatch=tauMatch)
+    ri_rj_N__ni_nj, threshold_count = precompute_BM(img_noisy, kHW=kHard, NHW=NHard, nHW=nHard, tauMatch=tauMatch)
     group_len = int(np.sum(threshold_count))
     group_3D_table = np.zeros((group_len, kHard, kHard))
     weight_table = np.zeros((height, width))
@@ -32,13 +32,13 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
         # fre_all_patches = dct_2d_forward(all_patches)  # TODO
     else:  # 'BIOR'
         fre_all_patches = bior_2d_forward(all_patches)
+    fre_all_patches = fre_all_patches.reshape((height-kHard+1, height-kHard+1, kHard, kHard))
 
     acc_pointer = 0
     for i_r in row_ind:
         for j_r in column_ind:
             nSx_r = threshold_count[i_r, j_r]
-            print(i_r, j_r)
-            group_3D = build_3D_group(fre_all_patches, Ir_Jr_N__Pnear[i_r, j_r], nSx_r)
+            group_3D = build_3D_group(fre_all_patches, ri_rj_N__ni_nj[i_r, j_r], nSx_r)
             group_3D = group_3D.reshape(kHard * kHard, nSx_r)
             group_3D, weight = ht_filtering_hadamard(group_3D, sigma, lambdaHard3D, not useSD)
             group_3D = group_3D.reshape(kHard, kHard, nSx_r)
@@ -65,7 +65,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
     for i_r in row_ind:
         for j_r in column_ind:
             nSx_r = threshold_count[i_r, j_r]
-            Pnear = Ir_Jr_N__Pnear[i_r, j_r]
+            Pnear = ri_rj_N__ni_nj[i_r, j_r]
             group_3D = group_3D_table[acc_pointer:acc_pointer + nSx_r]
             acc_pointer += nSx_r
             weight = weight_table[i_r, j_r]

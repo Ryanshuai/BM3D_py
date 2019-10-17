@@ -1,20 +1,4 @@
 import numpy as np
-import cv2
-
-
-def get_add_patch_matrix(n, nHW, kHW):
-    """
-    :param n: len of mat
-    :param nHW: len of search area
-    :param kHW: len of patch
-    :return: manipulate mat
-    """
-    mat = np.eye(n - 2 * nHW)
-    mat = np.pad(mat, nHW, 'constant')
-    res_mat = mat.copy()
-    for k in range(1, kHW):
-        res_mat += translation_2d_mat(mat, right=k, down=0)
-    return res_mat
 
 
 def precompute_BM(img, kHW, NHW, nHW, tauMatch):
@@ -39,19 +23,35 @@ def precompute_BM(img, kHW, NHW, nHW, tauMatch):
 
     sum_table = sum_table.reshape((Ns * Ns, height * width))  # di_dj, ph_pw
     sum_table_T = sum_table.transpose((1, 0))  # ph_pw__di_dj
-    argsort = np.argsort(sum_table_T, axis=1)
+
+    argsort = np.argsort(sum_table_T, axis=1)[:, :NHW]
     argsort_di = argsort // (Ns) - nHW
     argsort_dj = argsort % (Ns) - nHW
-    Pr_S__Vnear = argsort_di * width + argsort_dj
-    Pr_S__Pnear = Pr_S__Vnear + np.arange(Pr_S__Vnear.shape[0]).reshape((Pr_S__Vnear.shape[0], 1))
-    Pr_N__Pnear = Pr_S__Pnear[:, :NHW]
-    Ir_Jr_N__Pnear = Pr_N__Pnear.reshape((height, width, NHW))
+    near_pi = argsort_di.reshape((height, width, -1)) + np.arange(height)[:, np.newaxis, np.newaxis]
+    near_pj = argsort_dj.reshape((height, width, -1)) + np.arange(width)[np.newaxis, :, np.newaxis]
+    ri_rj_N__ni_nj = np.concatenate((near_pi[:, :, :, np.newaxis], near_pj[:, :, :, np.newaxis]), axis=-1)
+
     sum_filter = np.where(sum_table_T < threshold, 1, 0)
     threshold_count = np.sum(sum_filter, axis=1)
     threshold_count = closest_power_of_2(threshold_count, max_=NHW)
     threshold_count = threshold_count.reshape((height, width))
 
-    return Ir_Jr_N__Pnear, threshold_count
+    return ri_rj_N__ni_nj, threshold_count
+
+
+def get_add_patch_matrix(n, nHW, kHW):
+    """
+    :param n: len of mat
+    :param nHW: len of search area
+    :param kHW: len of patch
+    :return: manipulate mat
+    """
+    mat = np.eye(n - 2 * nHW)
+    mat = np.pad(mat, nHW, 'constant')
+    res_mat = mat.copy()
+    for k in range(1, kHW):
+        res_mat += translation_2d_mat(mat, right=k, down=0)
+    return res_mat
 
 
 def translation_2d_mat(mat, right, down):
@@ -66,4 +66,3 @@ def closest_power_of_2(M, max_):
         M = np.where((max_ // 2 < M) * (M < max_), max_ // 2, M)
         max_ //= 2
     return M
-

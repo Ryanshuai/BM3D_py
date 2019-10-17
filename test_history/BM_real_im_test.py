@@ -40,13 +40,12 @@ def my_precompute_BM(img, kHW, NHW, nHW, tauMatch):
     sum_table = sum_table.reshape((Ns * Ns, height * width))  # di_dj, ph_pw
     sum_table_T = sum_table.transpose((1, 0))  # ph_pw__di_dj
     # print(sum_table_T[22].reshape(Ns, Ns))
-    argsort = np.argsort(sum_table_T, axis=1)
+    argsort = np.argsort(sum_table_T, axis=1)[:, :NHW]
     argsort_di = argsort // (Ns) - nHW
     argsort_dj = argsort % (Ns) - nHW
-    Pr_S__Vnear = argsort_di * width + argsort_dj
-    Pr_S__Pnear = Pr_S__Vnear + np.arange(Pr_S__Vnear.shape[0]).reshape((Pr_S__Vnear.shape[0], 1))
-    Pr_N__Pnear = Pr_S__Pnear[:, :NHW]
-    Pr_N__Pnear = Pr_N__Pnear.reshape((height, width, NHW))
+    near_pi = argsort_di.reshape((height, width, -1)) + np.arange(height)[:, np.newaxis, np.newaxis]
+    near_pj = argsort_dj.reshape((height, width, -1)) + np.arange(width)[np.newaxis, :, np.newaxis]
+    near_pij = np.concatenate((near_pi[:, :, :, np.newaxis], near_pj[:, :, :, np.newaxis]), axis=-1)
     # for test
     # nn = 22
     # for ag, di, dj, posr, pr in zip(argsort[nn], argsort_di[nn], argsort_dj[nn], Pr_S__Vnear[nn], Pr_S__Pnear[nn]):
@@ -57,7 +56,7 @@ def my_precompute_BM(img, kHW, NHW, nHW, tauMatch):
     threshold_count = np.where(threshold_count <= NHW, threshold_count, NHW)
     threshold_count = threshold_count.reshape((height, width))
 
-    return Pr_N__Pnear, threshold_count
+    return near_pij, threshold_count
     # return Pr_N__Pnear, sum_table_T, argsort_di, argsort_dj, threshold_count
 
 
@@ -69,14 +68,14 @@ def translation_2d_mat(mat, right, down):
 
 if __name__ == '__main__':
     im = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
-    im = cv2.resize(im, (128, 128))
+    # im = cv2.resize(im, (128, 128))
     im_w = im.shape[1]
 
-    kHW, NHW, nHW, tauMatch = 8, 10, 16, 1000
-    Pr_N__Pnear, threshold_count = my_precompute_BM(im, kHW=kHW, NHW=NHW, nHW=nHW, tauMatch=tauMatch)
+    kHW, NHW, nHW, tauMatch = 8, 4, 16, 1000
+    near_pij, threshold_count = my_precompute_BM(im, kHW=kHW, NHW=NHW, nHW=nHW, tauMatch=tauMatch)
 
-    ref_i, ref_j = 180//2, 128//2
-    # Pr = ref_i * im_w + ref_j
+    ref_i, ref_j = 180, 128
+    # ref_i, ref_j = 100, 100
 
     im = cv2.cvtColor(im, cv2.COLOR_GRAY2RGB)
     cv2.rectangle(im, (ref_j, ref_i), (ref_j + kHW, ref_i + kHW), color=(255, 0, 0), thickness=1)
@@ -86,13 +85,12 @@ if __name__ == '__main__':
         cv2.circle(im, point, 0, (0, 0, 255), 1)
 
     count = threshold_count[ref_i, ref_j]
-    for i, Pnear in enumerate(Pr_N__Pnear[ref_i, ref_j]):
+    for i, Pnear in enumerate(near_pij[ref_i, ref_j]):
         if i == 0:
             continue
         if i > count:
             break
-        y = Pnear // im_w
-        x = Pnear % im_w
+        y, x = Pnear
         cv2.rectangle(im, (x, y), (x + kHW, y + kHW), color=(0, 255, 0), thickness=1)
 
     # cv2.imshow('im', im)

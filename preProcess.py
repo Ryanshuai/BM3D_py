@@ -40,6 +40,8 @@ def preProcess(kHW):
         for k in range(kHW*kHW):
             kaiserWindow[k] = 1.0
 
+    kaiserWindow = kaiserWindow.reshape((kHW,kHW))
+
     coef = 0.5 / ((float) (kHW))
     for i in range(kHW):
         for j in range(kHW):
