@@ -9,7 +9,8 @@ sigma = 10
 nHard = 16
 kHard = 8
 NHard = 16
-pHard = 3
+# pHard = 3
+pHard = 1
 useSD_h = False
 tau_2D_hard = 'BIOR'
 

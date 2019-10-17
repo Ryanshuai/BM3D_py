@@ -54,6 +54,7 @@ def my_precompute_BM(img, kHW, NHW, nHW, tauMatch):
     # for test
     sum_filter = np.where(sum_table_T < threshold, 1, 0)
     threshold_count = np.sum(sum_filter, axis=1)
+    threshold_count = np.where(threshold_count <= NHW, threshold_count, NHW)
     threshold_count = threshold_count.reshape((height, width))
 
     return Pr_N__Pnear, threshold_count
@@ -68,12 +69,13 @@ def translation_2d_mat(mat, right, down):
 
 if __name__ == '__main__':
     im = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
+    im = cv2.resize(im, (128, 128))
     im_w = im.shape[1]
 
     kHW, NHW, nHW, tauMatch = 8, 10, 16, 1000
     Pr_N__Pnear, threshold_count = my_precompute_BM(im, kHW=kHW, NHW=NHW, nHW=nHW, tauMatch=tauMatch)
 
-    ref_i, ref_j = 180, 128
+    ref_i, ref_j = 180//2, 128//2
     # Pr = ref_i * im_w + ref_j
 
     im = cv2.cvtColor(im, cv2.COLOR_GRAY2RGB)

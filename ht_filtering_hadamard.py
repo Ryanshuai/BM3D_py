@@ -13,12 +13,11 @@ def ht_filtering_hadamard(group_3D, sigma, lambdaHard3D, doWeight):  # group_3D 
     T = lambdaHard3D * sigma * coef_norm
     group_3D = np.where(group_3D > T, group_3D, 0)
     T_3D = np.where(group_3D > T, 1, 0)
-    weight = sum(T_3D)
+    weight = np.sum(T_3D)
 
     hadamard_transform(group_3D)
 
-    for k in range(group_3D.size):
-        group_3D[k] *= coef
+    group_3D *= coef
     if doWeight:
         weight = 1. / (sigma * sigma * weight) if weight > 0. else 1.
 
@@ -26,7 +25,7 @@ def ht_filtering_hadamard(group_3D, sigma, lambdaHard3D, doWeight):  # group_3D 
 
 
 def hadamard_transform(vec):
-    n = len(vec)
+    n = vec.shape[-1]
     h_mat = hadamard(n)
     v_h = vec @ h_mat
     return v_h

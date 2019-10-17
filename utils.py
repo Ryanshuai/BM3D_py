@@ -12,3 +12,4 @@ def add_gaussian_noise(im, sigma):
     im = np.clip(im, 0, 255, out=None)
     im = im.astype(np.uint8)
     return im
+

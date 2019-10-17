@@ -37,6 +37,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
     for i_r in row_ind:
         for j_r in column_ind:
             nSx_r = threshold_count[i_r, j_r]
+            print(i_r, j_r)
             group_3D = build_3D_group(fre_all_patches, Ir_Jr_N__Pnear[i_r, j_r], nSx_r)
             group_3D = group_3D.reshape(kHard * kHard, nSx_r)
             group_3D, weight = ht_filtering_hadamard(group_3D, sigma, lambdaHard3D, not useSD)

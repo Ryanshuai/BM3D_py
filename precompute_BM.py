@@ -48,7 +48,7 @@ def precompute_BM(img, kHW, NHW, nHW, tauMatch):
     Ir_Jr_N__Pnear = Pr_N__Pnear.reshape((height, width, NHW))
     sum_filter = np.where(sum_table_T < threshold, 1, 0)
     threshold_count = np.sum(sum_filter, axis=1)
-    threshold_count = np.where(threshold_count <= NHW, threshold_count, NHW)
+    threshold_count = closest_power_of_2(threshold_count, max_=NHW)
     threshold_count = threshold_count.reshape((height, width))
 
     return Ir_Jr_N__Pnear, threshold_count
@@ -58,3 +58,12 @@ def translation_2d_mat(mat, right, down):
     mat = np.roll(mat, right, axis=1)
     mat = np.roll(mat, down, axis=0)
     return mat
+
+
+def closest_power_of_2(M, max_):
+    M = np.where(max_ < M, max_, M)
+    while max_ > 1:
+        M = np.where((max_ // 2 < M) * (M < max_), max_ // 2, M)
+        max_ //= 2
+    return M
+

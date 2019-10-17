@@ -1,10 +1,10 @@
-import numpy as np
-import cv2
+def closest_power_of_2(n):
+    r = 1
+    while r * 2 <= n:
+        r *= 2
+    return r
 
-import pywt
-data = np.array([[[[1, 1, 1, 1],[1, 1, 1, 1],[1, 1, 1, 1],[1, 1, 1, 1]], [[1, 1, 1, 1],[1, 1, 1, 1],[1, 1, 1, 1],[1, 1, 1, 1]], [[0, 0, 0, 0],[0, 0, 0, 0],[0, 0, 0, 0],[0, 0, 0, 0]]],
-                [[[1, 1, 1, 1],[1, 1, 1, 1],[1, 1, 1, 1],[1, 1, 1, 1]], [[1, 1, 1, 1],[1, 1, 1, 1],[1, 1, 1, 1],[1, 1, 1, 1]], [[0, 0, 0, 0],[0, 0, 0, 0],[0, 0, 0, 0],[0, 0, 0, 0]]]])
-coeffs = pywt.dwt2(data, 'haar')
-cA, (cH, cV, cD) = coeffs
 
-print(cA)
+if __name__ == '__main__':
+    for i in range(20):
+        print(i, closest_power_of_2(i))
