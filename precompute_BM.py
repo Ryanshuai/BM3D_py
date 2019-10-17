@@ -66,4 +66,3 @@ def closest_power_of_2(M, max_):
         M = np.where((max_ // 2 < M) * (M < max_), max_ // 2, M)
         max_ //= 2
     return M
-

@@ -75,8 +75,8 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
                 Inear = P_r // weight
                 Jnear = P_r % weight
 
-                numerator[Inear:Inear+kHard, Jnear:Jnear+kHard] += patch * weight
-                denominator[Inear:Inear+kHard, Jnear:Jnear+kHard] += kaiserWindow * weight
+                numerator[Inear:Inear + kHard, Jnear:Jnear + kHard] += patch * weight
+                denominator[Inear:Inear + kHard, Jnear:Jnear + kHard] += kaiserWindow * weight
 
-    img_basic= numerator / denominator
+    img_basic = numerator / denominator
     return img_basic
