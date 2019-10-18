@@ -21,10 +21,8 @@ def ind_initialize(max_size, N, step):
     return ind
 
 
-def preProcess(kHW):
+def get_kaiserWindow(kHW):
     kaiserWindow = np.zeros(kHW * kHW)
-    coef_norm = np.zeros(kHW * kHW)
-    coef_norm_inv = np.zeros(kHW * kHW)
     if kHW == 8:
         kaiserWindow[0 + kHW * 0] = 0.1924
         kaiserWindow[0 + kHW * 1] = 0.2989
@@ -102,7 +100,13 @@ def preProcess(kHW):
             kaiserWindow[k] = 1.0
 
     kaiserWindow = kaiserWindow.reshape((kHW, kHW))
+    kaiserWindow = np.ones((kHW, kHW)) # TODO
+    return kaiserWindow
 
+
+def get_coef(kHW):
+    coef_norm = np.zeros(kHW * kHW)
+    coef_norm_inv = np.zeros(kHW * kHW)
     coef = 0.5 / ((float)(kHW))
     for i in range(kHW):
         for j in range(kHW):
@@ -116,7 +120,8 @@ def preProcess(kHW):
                 coef_norm[i * kHW + j] = 1.0 * coef
                 coef_norm_inv[i * kHW + j] = 1.0
 
-    return kaiserWindow, coef_norm, coef_norm_inv
+    return coef_norm, coef_norm_inv
+
 
 
 def sd_weighting(group_3D):

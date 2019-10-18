@@ -16,6 +16,9 @@ if __name__ == '__main__':
     img1 = cv2.imread('Cameraman256.png')
     img2 = cv2.imread('img_basic.png')
 
+    # img1 = cv2.imread('matlab_official_result/Cameraman256.png')
+    # img2 = cv2.imread('matlab_official_result/y_basic.png')
+
     psnr = compute_psnr(img1, img2)
 
     print(psnr)

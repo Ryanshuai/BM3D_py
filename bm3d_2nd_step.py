@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-from utils import ind_initialize, preProcess, sd_weighting
+from utils import ind_initialize, get_kaiserWindow, get_coef, sd_weighting
 from precompute_BM import precompute_BM
 from bior_2d import bior_2d_forward, bior_2d_reverse
 from image_to_patches import image2patches
@@ -17,7 +17,7 @@ def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, useSD
     row_ind = ind_initialize(height - kWien + 1, nWien, pWien)
     column_ind = ind_initialize(width - kWien + 1, nWien, pWien)
 
-    kaiserWindow, coef_norm, coef_norm_inv = preProcess(kWien)
+    kaiserWindow = get_kaiserWindow(kWien)
     ri_rj_N__ni_nj, threshold_count = precompute_BM(img_noisy, kHW=kWien, NHW=NWien, nHW=nWien, tauMatch=tauMatch)
     group_len = int(np.sum(threshold_count))
     group_3D_table = np.zeros((group_len, kWien, kWien))

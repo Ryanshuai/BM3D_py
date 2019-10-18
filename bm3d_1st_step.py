@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-from utils import ind_initialize, preProcess, sd_weighting
+from utils import ind_initialize, get_kaiserWindow, get_coef, sd_weighting
 from precompute_BM import precompute_BM
 from bior_2d import bior_2d_forward, bior_2d_reverse
 from image_to_patches import image2patches
@@ -18,7 +18,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
     row_ind = ind_initialize(height - kHard + 1, nHard, pHard)
     column_ind = ind_initialize(width - kHard + 1, nHard, pHard)
 
-    kaiserWindow, coef_norm, coef_norm_inv = preProcess(kHard)
+    kaiserWindow = get_kaiserWindow(kHard)
     ri_rj_N__ni_nj, threshold_count = precompute_BM(img_noisy, kHW=kHard, NHW=NHard, nHW=nHard, tauMatch=tauMatch)
     group_len = int(np.sum(threshold_count))
     group_3D_table = np.zeros((group_len, kHard, kHard))
@@ -55,12 +55,12 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
     else:  # 'BIOR'
         group_3D_table = bior_2d_reverse(group_3D_table)
 
-    # for i in range(1000):
-    #     patch = group_3D_table[i]
-    #     print(i, '----------------------------')
-    #     print(patch)
-    #     cv2.imshow('', patch.astype(np.uint8))
-    #     cv2.waitKey()
+    for i in range(1000):
+        patch = group_3D_table[i]
+        print(i, '----------------------------')
+        print(patch)
+        cv2.imshow('', patch.astype(np.uint8))
+        cv2.waitKey()
 
 
     group_3D_table *= kaiserWindow
