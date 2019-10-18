@@ -7,8 +7,8 @@ from bm3d_2nd_step import bm3d_2nd_step
 # <hyper parameter> -------------------------------------------------------------------------------
 sigma = 25
 
-nHard = 40
-kHard = 32
+nHard = 16
+kHard = 8
 NHard = 16
 pHard = 3
 useSD_h = False
@@ -24,7 +24,7 @@ tau_2D_wien = 'DCT'
 
 
 img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
-img = cv2.resize(img, (128, 128))
+# img = cv2.resize(img, (128, 128))
 img_noisy = add_gaussian_noise(img, sigma)
 # img_noisy = cv2.imread('matlab_official_result/noisy_image.png', cv2.IMREAD_GRAYSCALE)
 

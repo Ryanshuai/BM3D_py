@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-from utils import ind_initialize, get_kaiserWindow, get_coef, sd_weighting
+from utils import ind_initialize, get_kaiserWindow, sd_weighting
 from precompute_BM import precompute_BM
 from bior_2d import bior_2d_forward, bior_2d_reverse
 from image_to_patches import image2patches
@@ -55,13 +55,16 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
     else:  # 'BIOR'
         group_3D_table = bior_2d_reverse(group_3D_table)
 
-    for i in range(1000):
-        patch = group_3D_table[i]
-        print(i, '----------------------------')
-        print(patch)
-        cv2.imshow('', patch.astype(np.uint8))
-        cv2.waitKey()
-
+    # group_3D_table = np.maximum(group_3D_table, 0)
+    # for i in range(1000):
+    #     patch = group_3D_table[i]
+    #     print(i, '----------------------------')
+    #     print(patch)
+    #     print(np.min(patch))
+    #     print(np.max(patch))
+    #     print(np.sum(patch))
+    #     cv2.imshow('', patch.astype(np.uint8))
+    #     cv2.waitKey()
 
     group_3D_table *= kaiserWindow
 
@@ -85,3 +88,30 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
     img_basic= numerator / denominator
     img_basic = img_basic.astype(np.uint8)
     return img_basic
+
+
+if __name__ == '__main__':
+    from utils import add_gaussian_noise, symetrize
+
+    # <hyper parameter> -------------------------------------------------------------------------------
+    sigma = 25
+
+    nHard = 16
+    kHard = 8
+    NHard = 16
+    pHard = 3
+    useSD_h = False
+    tau_2D_hard = 'BIOR'
+
+    # <\ hyper parameter> -----------------------------------------------------------------------------
+
+    img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
+    # img = cv2.resize(img, (128, 128))
+    img_noisy = add_gaussian_noise(img, sigma)
+    # img_noisy = cv2.imread('matlab_official_result/noisy_image.png', cv2.IMREAD_GRAYSCALE)
+
+    img_noisy_p = symetrize(img_noisy, nHard)
+    img_basic = bm3d_1st_step(sigma, img_noisy_p, nHard, kHard, NHard, pHard, useSD_h, tau_2D_hard)
+    img_basic = img_basic[nHard: -nHard, nHard: -nHard]
+
+    cv2.imwrite('img_basic.png', img_basic)
