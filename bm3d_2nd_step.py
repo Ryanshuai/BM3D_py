@@ -89,6 +89,6 @@ def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, useSD
                 numerator[ni:ni + kWien, nj:nj + kWien] += patch * weight
                 denominator[ni:ni + kWien, nj:nj + kWien] += kaiserWindow * weight
 
-    img_denoised= numerator / denominator
+    img_denoised = numerator / denominator
     img_denoised = img_denoised.astype(np.uint8)
     return img_denoised
