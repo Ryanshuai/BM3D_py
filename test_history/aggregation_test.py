@@ -1,28 +1,12 @@
 import numpy as np
-import math
-
-from ind_initialize import ind_initialize
-from preProcess import preProcess
-from precompute_BM import precompute_BM
-from bior_2d import bior_2d_forward
-from image_to_patches import image2patches
-from build_3D_group import build_3D_group
-from sd_weighting import sd_weighting
-from bior_2d import bior_2d_reverse
-
-
-import numpy as np
 import cv2
 
-from ind_initialize import ind_initialize
-from preProcess import preProcess
+from utils import ind_initialize, preProcess, sd_weighting
 from precompute_BM import precompute_BM
-from bior_2d import bior_2d_forward
+from bior_2d import bior_2d_forward, bior_2d_reverse
 from image_to_patches import image2patches
 from build_3D_group import build_3D_group
 from ht_filtering_hadamard import ht_filtering_hadamard
-from sd_weighting import sd_weighting
-from bior_2d import bior_2d_reverse
 
 
 def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
@@ -46,7 +30,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
         # fre_all_patches = dct_2d_forward(all_patches)  # TODO
     else:  # 'BIOR'
         fre_all_patches = bior_2d_forward(all_patches)
-    fre_all_patches = fre_all_patches.reshape((height-kHard+1, height-kHard+1, kHard, kHard))
+    fre_all_patches = fre_all_patches.reshape((height - kHard + 1, height - kHard + 1, kHard, kHard))
 
     acc_pointer = 0
     for i_r in row_ind:
@@ -79,7 +63,6 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
     #     cv2.imshow('', patch.astype(np.uint8))
     #     cv2.waitKey()
 
-
     group_3D_table *= kaiserWindow
 
     numerator = np.zeros_like(img_noisy, dtype=np.float)
@@ -96,10 +79,10 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
                 ni, nj = N_ni_nj[n]
                 patch = group_3D[n]
 
-                numerator[ni:ni+kHard, nj:nj+kHard] += patch * weight
-                denominator[ni:ni+kHard, nj:nj+kHard] += kaiserWindow * weight
+                numerator[ni:ni + kHard, nj:nj + kHard] += patch * weight
+                denominator[ni:ni + kHard, nj:nj + kHard] += kaiserWindow * weight
 
-    img_basic= numerator / denominator
+    img_basic = numerator / denominator
     img_basic = img_basic.astype(np.uint8)
     return img_basic
 
