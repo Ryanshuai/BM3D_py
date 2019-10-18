@@ -59,12 +59,12 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
     else:  # 'BIOR'
         group_3D_table = bior_2d_reverse(group_3D_table)
 
-    for i in range(1000):
-        patch = group_3D_table[i]
-        print(i, '----------------------------')
-        print(patch)
-        cv2.imshow('', patch.astype(np.uint8))
-        cv2.waitKey()
+    # for i in range(1000):
+    #     patch = group_3D_table[i]
+    #     print(i, '----------------------------')
+    #     print(patch)
+    #     cv2.imshow('', patch.astype(np.uint8))
+    #     cv2.waitKey()
 
 
     group_3D_table *= kaiserWindow

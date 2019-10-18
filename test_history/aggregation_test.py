@@ -11,21 +11,18 @@ from sd_weighting import sd_weighting
 from bior_2d import bior_2d_reverse
 
 
-def ht_filtering_hadamard(group_3D, sigma, lambdaHard3D, doWeight):  # group_3D shape=(n*n, nSx_r)
-    nSx_r = group_3D.shape[-1]
-    coef_norm = math.sqrt(nSx_r)
-    coef = 1.0 / nSx_r
+import numpy as np
+import cv2
 
-    T = lambdaHard3D * sigma * coef_norm
-    group_3D = np.where(group_3D > T, group_3D, 0)
-    T_3D = np.where(group_3D > T, 1, 0)
-    weight = np.sum(T_3D)
-
-    group_3D *= coef
-    if doWeight:
-        weight = 1.
-
-    return group_3D, weight
+from ind_initialize import ind_initialize
+from preProcess import preProcess
+from precompute_BM import precompute_BM
+from bior_2d import bior_2d_forward
+from image_to_patches import image2patches
+from build_3D_group import build_3D_group
+from ht_filtering_hadamard import ht_filtering_hadamard
+from sd_weighting import sd_weighting
+from bior_2d import bior_2d_reverse
 
 
 def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
@@ -41,14 +38,14 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
     ri_rj_N__ni_nj, threshold_count = precompute_BM(img_noisy, kHW=kHard, NHW=NHard, nHW=nHard, tauMatch=tauMatch)
     group_len = int(np.sum(threshold_count))
     group_3D_table = np.zeros((group_len, kHard, kHard))
-    weight_table = np.ones((height, width))
+    weight_table = np.zeros((height, width))
 
     all_patches = image2patches(img_noisy, k=kHard, p=pHard)  # i_j_ipatch_jpatch__v
     if tau_2D == 'DCT':
         pass
-        # fre_all_patches = dct_2d_forward(all_patches)
+        # fre_all_patches = dct_2d_forward(all_patches)  # TODO
     else:  # 'BIOR'
-        fre_all_patches = all_patches  # !!!
+        fre_all_patches = bior_2d_forward(all_patches)
     fre_all_patches = fre_all_patches.reshape((height-kHard+1, height-kHard+1, kHard, kHard))
 
     acc_pointer = 0
@@ -57,7 +54,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
             nSx_r = threshold_count[i_r, j_r]
             group_3D = build_3D_group(fre_all_patches, ri_rj_N__ni_nj[i_r, j_r], nSx_r)
             group_3D = group_3D.reshape(kHard * kHard, nSx_r)
-            group_3D, weight = ht_filtering_hadamard(group_3D, sigma, lambdaHard3D, not useSD)
+            # group_3D, weight = ht_filtering_hadamard(group_3D, sigma, lambdaHard3D, not useSD)
             group_3D = group_3D.reshape(kHard, kHard, nSx_r)
             group_3D = group_3D.transpose((2, 0, 1))
             group_3D_table[acc_pointer:acc_pointer + nSx_r] = group_3D
@@ -66,19 +63,24 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
             if useSD:
                 weight = sd_weighting(group_3D)
 
-            weight_table[i_r, j_r] = weight
+            # weight_table[i_r, j_r] = weight
+            weight_table[i_r, j_r] = 1
 
     if tau_2D == 'DCT':
         pass
-        # dct_2d_reverse(group_3D_table)
+        # dct_2d_reverse(group_3D_table)  # TODO
     else:  # 'BIOR'
-        group_3D_table = group_3D_table
+        group_3D_table = bior_2d_reverse(group_3D_table)
 
     # for i in range(1000):
     #     patch = group_3D_table[i]
-    #     cv2.imshow('patch', patch)
+    #     print(i, '----------------------------')
+    #     print(patch)
+    #     cv2.imshow('', patch.astype(np.uint8))
+    #     cv2.waitKey()
 
-    # group_3D_table *= kaiserWindow
+
+    group_3D_table *= kaiserWindow
 
     numerator = np.zeros_like(img_noisy, dtype=np.float)
     denominator = np.zeros_like(img_noisy, dtype=np.float)
@@ -95,8 +97,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
                 patch = group_3D[n]
 
                 numerator[ni:ni+kHard, nj:nj+kHard] += patch * weight
-                # denominator[ni:ni+kHard, nj:nj+kHard] += kaiserWindow * weight
-                denominator[ni:ni+kHard, nj:nj+kHard] += weight
+                denominator[ni:ni+kHard, nj:nj+kHard] += kaiserWindow * weight
 
     img_basic= numerator / denominator
     img_basic = img_basic.astype(np.uint8)
@@ -127,6 +128,12 @@ if __name__ == '__main__':
     img_noisy = symetrize(img, nHard)
 
     img_basic = bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD_h, tau_2D_hard)
+
+    img_basic = img_basic[nHard: -nHard, nHard: -nHard]
+
+    diff = np.abs(img - img_basic)
+    print('max: ', np.max(diff))
+    print('sum: ', np.sum(diff))
 
     cv2.imwrite('img_basic.png', img_basic)
     cv2.imshow('', img_basic)
