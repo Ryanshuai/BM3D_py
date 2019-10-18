@@ -20,7 +20,7 @@ def wiener_filtering_hadamard(group_3D_img, group_3D_est, sigma, doWeight):
     if doWeight:
         weight = 1. / (sigma * sigma * weight) if weight > 0. else 1.
 
-    return weight
+    return group_3D_est, weight
 
 
 def hadamard_transform(vec):
