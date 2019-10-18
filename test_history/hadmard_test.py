@@ -25,31 +25,30 @@ def hadamard_transform(vec, N, start):
         hadamard_transform(vec, n, start + n)
 
 
-def hadamard_transform_(vec, n, start):
+def hadamard_transform_(vec):
+    n = vec.shape[-1]
     h_mat = hadamard(n)
-    v = vec[start: start+n]
-    v_h = np.matmul(v, h_mat)
-    vec[start: start+n] = v_h
-    return vec
+    v_h = vec @ h_mat
+    return v_h
 
 
 if __name__ == '__main__':
     vec = np.array([11, 3, 23, 37])
     # vec = np.array([11, 3, 23, 37, 5, 7, 13, 29, ])
-    # vec = np.array([11, 3, 23, 37, 5, 7, 13, 29, 11, 3, 23, 37, 5, 7, 13, 29])
+    vec = np.array([11, 3, 23, 37, 5, 7, 13, 29, 11, 3, 23, 37, 5, 7, 13, 29])
     # vec = np.array([1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0])
     # vec = np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1])
 
-    N = len(vec)//2
-    start = len(vec)//2
+    N = len(vec)
+    start = 0
 
     v = vec.copy()
-    hadamard_transform_(v, N, start)
+    v_h = hadamard_transform_(v)
     print('my hadamard transform')
-    print(v)
-    hadamard_transform_(v, N, start)
+    print(v_h)
+    vv = hadamard_transform_(v_h)
     print('my hadamard inverse transform')
-    print(v)
+    print(vv)
 
     v = vec.copy()
     hadamard_transform(v, N, start)

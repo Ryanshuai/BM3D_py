@@ -135,6 +135,6 @@ if __name__ == '__main__':
     print('max: ', np.max(diff))
     print('sum: ', np.sum(diff))
 
-    cv2.imwrite('img_basic.png', img_basic)
+    cv2.imwrite('aggregation_test.png', img_basic)
     cv2.imshow('', img_basic)
     cv2.waitKey()

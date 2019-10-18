@@ -8,14 +8,14 @@ def ht_filtering_hadamard(group_3D, sigma, lambdaHard3D, doWeight):  # group_3D 
     coef_norm = math.sqrt(nSx_r)
     coef = 1.0 / nSx_r
 
-    hadamard_transform(group_3D)
+    group_3D_h = hadamard_transform(group_3D)
 
     T = lambdaHard3D * sigma * coef_norm
-    group_3D = np.where(group_3D > T, group_3D, 0)
-    T_3D = np.where(group_3D > T, 1, 0)
+    T_3D = np.where(np.abs(group_3D_h) > T, 1, 0)
     weight = np.sum(T_3D)
+    group_3D_h = np.where(group_3D_h > T, group_3D_h, 0)
 
-    hadamard_transform(group_3D)
+    group_3D = hadamard_transform(group_3D_h)
 
     group_3D *= coef
     if doWeight:

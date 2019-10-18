@@ -25,12 +25,13 @@ tau_2D_wien = 'DCT'
 
 
 img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
-img = cv2.resize(img, (128, 128))
+# img = cv2.resize(img, (128, 128))
 img_noisy = add_gaussian_noise(img, sigma)
-
 img_noisy = symetrize(img_noisy, nHard)
 
 img_basic = bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD_h, tau_2D_hard)
+img_basic = img_basic[nHard: -nHard, nHard: -nHard]
 
+cv2.imwrite('img_basic.png', img_basic)
 cv2.imshow('', img_basic)
 cv2.waitKey()
