@@ -17,7 +17,6 @@ print(dct_img.astype(np.int))
 recovered_img = idct(idct(dct_img, axis=1), axis=0)
 print(recovered_img)
 
-
 if __name__ == '__main__':
     import cv2
 
