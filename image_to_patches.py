@@ -17,7 +17,7 @@ def image2patches(im, k, p):
     '''
     :param im:
     :param k: patch size
-    :param p: step TODO
+    :param p: step
     :return:
     '''
     assert im.ndim == 2

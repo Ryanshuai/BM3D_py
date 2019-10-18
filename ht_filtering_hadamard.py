@@ -26,6 +26,6 @@ def ht_filtering_hadamard(group_3D, sigma, lambdaHard3D, doWeight):  # group_3D 
 
 def hadamard_transform(vec):
     n = vec.shape[-1]
-    h_mat = hadamard(n)
+    h_mat = hadamard(n).astype(np.float64)
     v_h = vec @ h_mat
     return v_h

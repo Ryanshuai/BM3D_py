@@ -1,9 +1,10 @@
 import numpy as np
 import cv2
 
-from utils import ind_initialize, get_kaiserWindow, get_coef, sd_weighting
+from utils import ind_initialize, get_kaiserWindow, sd_weighting
 from precompute_BM import precompute_BM
 from bior_2d import bior_2d_forward, bior_2d_reverse
+from dct_2d import dct_2d_forward, dct_2d_reverse
 from image_to_patches import image2patches
 from build_3D_group import build_3D_group
 from wiener_filtering_hadamard import wiener_filtering_hadamard
@@ -26,8 +27,8 @@ def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, useSD
     noisy_patches = image2patches(img_noisy, k=kWien, p=pWien)  # i_j_ipatch_jpatch__v
     basic_patches = image2patches(img_basic, k=kWien, p=pWien)  # i_j_ipatch_jpatch__v
     if tau_2D == 'DCT':
-        pass
-        # fre_all_patches = dct_2d_forward(all_patches)  # TODO
+        fre_noisy_patches = dct_2d_forward(noisy_patches)
+        fre_basic_patches = dct_2d_forward(basic_patches)
     else:  # 'BIOR'
         fre_noisy_patches = bior_2d_forward(noisy_patches)
         fre_basic_patches = bior_2d_forward(basic_patches)
@@ -58,8 +59,7 @@ def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, useSD
             weight_table[i_r, j_r] = weight
 
     if tau_2D == 'DCT':
-        pass
-        # dct_2d_reverse(group_3D_table)  # TODO
+        group_3D_table = dct_2d_reverse(group_3D_table)
     else:  # 'BIOR'
         group_3D_table = bior_2d_reverse(group_3D_table)
 

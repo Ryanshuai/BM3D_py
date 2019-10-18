@@ -100,7 +100,7 @@ def get_kaiserWindow(kHW):
             kaiserWindow[k] = 1.0
 
     kaiserWindow = kaiserWindow.reshape((kHW, kHW))
-    kaiserWindow = np.ones((kHW, kHW)) # TODO
+    # kaiserWindow = np.ones((kHW, kHW))
     return kaiserWindow
 
 

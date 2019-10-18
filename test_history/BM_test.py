@@ -85,7 +85,7 @@ def precompute_BM(img, width, height, kHW, NHW, nHW, pHW, tauMatch):
 
             # partial_sort(table_distance.begin(), table_distance.begin() + nSx_r,
             #                               table_distance.end(), ComparaisonFirst);
-            sorted(table_distance, key=lambda x: x[0], )  # TODO some problem， seems like it dose not work
+            sorted(table_distance, key=lambda x: x[0], )  # some problem， seems like it dose not work
 
             for n in range(nSx_r):
                 patch_table[k_r][n] = table_distance[n][1]

@@ -4,6 +4,7 @@ import cv2
 from utils import ind_initialize, get_kaiserWindow, sd_weighting
 from precompute_BM import precompute_BM
 from bior_2d import bior_2d_forward, bior_2d_reverse
+from dct_2d import dct_2d_forward, dct_2d_reverse
 from image_to_patches import image2patches
 from build_3D_group import build_3D_group
 from ht_filtering_hadamard import ht_filtering_hadamard
@@ -26,8 +27,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
 
     all_patches = image2patches(img_noisy, k=kHard, p=pHard)  # i_j_ipatch_jpatch__v
     if tau_2D == 'DCT':
-        pass
-        # fre_all_patches = dct_2d_forward(all_patches)  # TODO
+        fre_all_patches = dct_2d_forward(all_patches)
     else:  # 'BIOR'
         fre_all_patches = bior_2d_forward(all_patches)
     fre_all_patches = fre_all_patches.reshape((height-kHard+1, height-kHard+1, kHard, kHard))
@@ -50,8 +50,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
             weight_table[i_r, j_r] = weight
 
     if tau_2D == 'DCT':
-        pass
-        # dct_2d_reverse(group_3D_table)  # TODO
+        group_3D_table = dct_2d_reverse(group_3D_table)
     else:  # 'BIOR'
         group_3D_table = bior_2d_reverse(group_3D_table)
 
@@ -107,8 +106,8 @@ if __name__ == '__main__':
 
     img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
     # img = cv2.resize(img, (128, 128))
-    img_noisy = add_gaussian_noise(img, sigma)
-    # img_noisy = cv2.imread('matlab_official_result/noisy_image.png', cv2.IMREAD_GRAYSCALE)
+    # img_noisy = add_gaussian_noise(img, sigma)
+    img_noisy = cv2.imread('matlab_official_compare/noisy_image.png', cv2.IMREAD_GRAYSCALE)
 
     img_noisy_p = symetrize(img_noisy, nHard)
     img_basic = bm3d_1st_step(sigma, img_noisy_p, nHard, kHard, NHard, pHard, useSD_h, tau_2D_hard)
