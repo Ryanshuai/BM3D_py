@@ -30,8 +30,6 @@ def original_bior_2d_forward_(output, N, lpd, hpd):
         for i in range(N_1):
             for j in range(len(tmp)):
                 tmp[j] = output[i * N + ind_per[j]]
-                if iter == 1:
-                    print(j, ind_per[j])
 
             for j in range(N_2):
                 v_l = 0.

@@ -24,8 +24,9 @@ if __name__ == '__main__':
     import pywt
     import matplotlib.pyplot as plt
 
-    img = cv2.imread('Cameraman256.png')
+    img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
     img = img.astype(np.float64)
+    img = img[0:8, 0:8]
 
     # original way
     original_bior_img = original_bior_2d_forward(img)
@@ -34,10 +35,10 @@ if __name__ == '__main__':
     bior_img = bior_2d_forward(img.copy())
 
 
-    a, b = 0, 8
-    c, d = 0, 8
-    print('original_bior_img\n', original_bior_img[a:b, c:d].astype(np.int))
-    print('bior_img\n', bior_img[a:b, c:d].astype(np.int))
+    # a, b = 0, 8
+    # c, d = 0, 8
+    # print('original_bior_img\n', original_bior_img[a:b, c:d].astype(np.int))
+    # print('bior_img\n', bior_img[a:b, c:d].astype(np.int))
 
     # print('max original_bior_img', np.max(original_bior_img))
     # print('min original_bior_img', np.min(original_bior_img))

@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 from ind_initialize import ind_initialize
 from preProcess import preProcess
@@ -6,9 +7,25 @@ from precompute_BM import precompute_BM
 from bior_2d import bior_2d_forward
 from image_to_patches import image2patches
 from build_3D_group import build_3D_group
-from ht_filtering_hadamard import ht_filtering_hadamard
 from sd_weighting import sd_weighting
 from bior_2d import bior_2d_reverse
+
+
+def ht_filtering_hadamard(group_3D, sigma, lambdaHard3D, doWeight):  # group_3D shape=(n*n, nSx_r)
+    nSx_r = group_3D.shape[-1]
+    coef_norm = math.sqrt(nSx_r)
+    coef = 1.0 / nSx_r
+
+    T = lambdaHard3D * sigma * coef_norm
+    group_3D = np.where(group_3D > T, group_3D, 0)
+    T_3D = np.where(group_3D > T, 1, 0)
+    weight = np.sum(T_3D)
+
+    group_3D *= coef
+    if doWeight:
+        weight = 1.
+
+    return group_3D, weight
 
 
 def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
@@ -24,12 +41,12 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
     ri_rj_N__ni_nj, threshold_count = precompute_BM(img_noisy, kHW=kHard, NHW=NHard, nHW=nHard, tauMatch=tauMatch)
     group_len = int(np.sum(threshold_count))
     group_3D_table = np.zeros((group_len, kHard, kHard))
-    weight_table = np.zeros((height, width))
+    weight_table = np.ones((height, width))
 
     all_patches = image2patches(img_noisy, k=kHard, p=pHard)  # i_j_ipatch_jpatch__v
     if tau_2D == 'DCT':
         pass
-        # fre_all_patches = dct_2d_forward(all_patches)  # TODO
+        # fre_all_patches = dct_2d_forward(all_patches)
     else:  # 'BIOR'
         fre_all_patches = all_patches  # !!!
     fre_all_patches = fre_all_patches.reshape((height-kHard+1, height-kHard+1, kHard, kHard))
@@ -53,11 +70,15 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
 
     if tau_2D == 'DCT':
         pass
-        # dct_2d_reverse(group_3D_table)  # TODO
+        # dct_2d_reverse(group_3D_table)
     else:  # 'BIOR'
-        bior_2d_reverse(group_3D_table)
+        group_3D_table = group_3D_table
 
-    group_3D_table *= kaiserWindow
+    # for i in range(1000):
+    #     patch = group_3D_table[i]
+    #     cv2.imshow('patch', patch)
+
+    # group_3D_table *= kaiserWindow
 
     numerator = np.zeros_like(img_noisy, dtype=np.float)
     denominator = np.zeros_like(img_noisy, dtype=np.float)
@@ -74,7 +95,8 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
                 patch = group_3D[n]
 
                 numerator[ni:ni+kHard, nj:nj+kHard] += patch * weight
-                denominator[ni:ni+kHard, nj:nj+kHard] += kaiserWindow * weight
+                # denominator[ni:ni+kHard, nj:nj+kHard] += kaiserWindow * weight
+                denominator[ni:ni+kHard, nj:nj+kHard] += weight
 
     img_basic= numerator / denominator
     img_basic = img_basic.astype(np.uint8)
@@ -83,9 +105,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
 
 if __name__ == '__main__':
     import cv2
-
     from utils import add_gaussian_noise, symetrize
-    from bm3d_1st_step import bm3d_1st_step
 
     # <hyper parameter> -------------------------------------------------------------------------------
     sigma = 10
@@ -98,22 +118,16 @@ if __name__ == '__main__':
     useSD_h = False
     tau_2D_hard = 'BIOR'
 
-    nWien = 16
-    kWien = 8
-    NWien = 16
-    pWien = 3
-    useSD_w = True
-    tau_2D_wien = 'DCT'
-
     # <\ hyper parameter> -----------------------------------------------------------------------------
 
     img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
-    img = cv2.resize(img, (128, 128))
-    img_noisy = add_gaussian_noise(img, sigma)
+    # img = cv2.resize(img, (128, 128))
+    # img = add_gaussian_noise(img, sigma)
 
-    img_noisy = symetrize(img_noisy, nHard)
+    img_noisy = symetrize(img, nHard)
 
     img_basic = bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD_h, tau_2D_hard)
 
+    cv2.imwrite('img_basic.png', img_basic)
     cv2.imshow('', img_basic)
     cv2.waitKey()

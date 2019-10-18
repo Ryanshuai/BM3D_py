@@ -41,7 +41,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
             nSx_r = threshold_count[i_r, j_r]
             group_3D = build_3D_group(fre_all_patches, ri_rj_N__ni_nj[i_r, j_r], nSx_r)
             group_3D = group_3D.reshape(kHard * kHard, nSx_r)
-            group_3D, weight = ht_filtering_hadamard(group_3D, sigma, lambdaHard3D, not useSD)
+            # group_3D, weight = ht_filtering_hadamard(group_3D, sigma, lambdaHard3D, not useSD)
             group_3D = group_3D.reshape(kHard, kHard, nSx_r)
             group_3D = group_3D.transpose((2, 0, 1))
             group_3D_table[acc_pointer:acc_pointer + nSx_r] = group_3D
@@ -50,23 +50,27 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
             if useSD:
                 weight = sd_weighting(group_3D)
 
-            weight_table[i_r, j_r] = weight
+            # weight_table[i_r, j_r] = weight
+            weight_table[i_r, j_r] = 1
 
     if tau_2D == 'DCT':
         pass
         # dct_2d_reverse(group_3D_table)  # TODO
     else:  # 'BIOR'
-        bior_2d_reverse(group_3D_table)
+        group_3D_table = bior_2d_reverse(group_3D_table)
 
-    for i in range(100):
-        cv2.imshow('', group_3D_table[i])
+    for i in range(1000):
+        patch = group_3D_table[i]
+        print(i, '----------------------------')
+        print(patch)
+        cv2.imshow('', patch.astype(np.uint8))
         cv2.waitKey()
 
 
     group_3D_table *= kaiserWindow
 
     numerator = np.zeros_like(img_noisy, dtype=np.float)
-    denominator = np.zeros_like(img_noisy, dtype=np.float)
+    denominator = np.ones_like(img_noisy, dtype=np.float)
     acc_pointer = 0
     for i_r in row_ind:
         for j_r in column_ind:
