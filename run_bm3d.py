@@ -33,3 +33,4 @@ img_noisy = symetrize(img_noisy, nHard)
 img_basic = bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD_h, tau_2D_hard)
 
 cv2.imshow('', img_basic)
+cv2.waitKey()

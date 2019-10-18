@@ -1,5 +1,4 @@
 import numpy as np
-import cv2
 
 from ind_initialize import ind_initialize
 from preProcess import preProcess
@@ -32,7 +31,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
         pass
         # fre_all_patches = dct_2d_forward(all_patches)  # TODO
     else:  # 'BIOR'
-        fre_all_patches = bior_2d_forward(all_patches)
+        fre_all_patches = all_patches  # !!!
     fre_all_patches = fre_all_patches.reshape((height-kHard+1, height-kHard+1, kHard, kHard))
 
     acc_pointer = 0
@@ -58,11 +57,6 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
     else:  # 'BIOR'
         bior_2d_reverse(group_3D_table)
 
-    for i in range(100):
-        cv2.imshow('', group_3D_table[i])
-        cv2.waitKey()
-
-
     group_3D_table *= kaiserWindow
 
     numerator = np.zeros_like(img_noisy, dtype=np.float)
@@ -85,3 +79,41 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
     img_basic= numerator / denominator
     img_basic = img_basic.astype(np.uint8)
     return img_basic
+
+
+if __name__ == '__main__':
+    import cv2
+
+    from utils import add_gaussian_noise, symetrize
+    from bm3d_1st_step import bm3d_1st_step
+
+    # <hyper parameter> -------------------------------------------------------------------------------
+    sigma = 10
+
+    nHard = 16
+    kHard = 8
+    NHard = 16
+    # pHard = 3
+    pHard = 1
+    useSD_h = False
+    tau_2D_hard = 'BIOR'
+
+    nWien = 16
+    kWien = 8
+    NWien = 16
+    pWien = 3
+    useSD_w = True
+    tau_2D_wien = 'DCT'
+
+    # <\ hyper parameter> -----------------------------------------------------------------------------
+
+    img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
+    img = cv2.resize(img, (128, 128))
+    img_noisy = add_gaussian_noise(img, sigma)
+
+    img_noisy = symetrize(img_noisy, nHard)
+
+    img_basic = bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD_h, tau_2D_hard)
+
+    cv2.imshow('', img_basic)
+    cv2.waitKey()

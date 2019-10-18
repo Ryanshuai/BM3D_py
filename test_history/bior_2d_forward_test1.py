@@ -127,12 +127,12 @@ if __name__ == '__main__':
     # img = img[:64, :64]
     img = img.astype(np.float64)
 
-    # original way
-    img_flat = img.flatten()
-    N = int(math.sqrt(len(img_flat)))
-    lpd, hpd, lpr, hpr = bior15_coef()
-    original_bior_2d_forward_(img_flat, N, lpd, hpd)
-    original_bior_img = img_flat.reshape(N, N)
+    # # original way
+    # img_flat = img.flatten()
+    # N = int(math.sqrt(len(img_flat)))
+    # lpd, hpd, lpr, hpr = bior15_coef()
+    # original_bior_2d_forward_(img_flat, N, lpd, hpd)
+    # original_bior_img = img_flat.reshape(N, N)
 
     # my way
     coeffs2 = pywt.dwt2(img, 'bior1.5', mode='periodization')

@@ -24,8 +24,7 @@ if __name__ == '__main__':
     import pywt
     import matplotlib.pyplot as plt
 
-    # input
-    img = pywt.data.camera()
+    img = cv2.imread('Cameraman256.png')
     img = img.astype(np.float64)
 
     # original way
@@ -35,8 +34,8 @@ if __name__ == '__main__':
     bior_img = bior_2d_forward(img.copy())
 
 
-    a, b = 0, 4
-    c, d = 0, 4
+    a, b = 0, 8
+    c, d = 0, 8
     print('original_bior_img\n', original_bior_img[a:b, c:d].astype(np.int))
     print('bior_img\n', bior_img[a:b, c:d].astype(np.int))
 
