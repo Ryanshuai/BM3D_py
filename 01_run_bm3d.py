@@ -3,6 +3,7 @@ import cv2
 from utils import add_gaussian_noise, symetrize
 from bm3d_1st_step import bm3d_1st_step
 from bm3d_2nd_step import bm3d_2nd_step
+from psnr import compute_psnr
 
 # <hyper parameter> -------------------------------------------------------------------------------
 sigma = 25
@@ -19,13 +20,15 @@ kWien = 8
 NWien = 16
 pWien = 3
 useSD_w = True
-tau_2D_wien = 'DCT'
+# tau_2D_wien = 'DCT'
+tau_2D_wien = 'BIOR'
 # <\ hyper parameter> -----------------------------------------------------------------------------
 
 
 img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
-img = cv2.resize(img, (128, 128))
+# img = cv2.resize(img, (128, 128))
 img_noisy = add_gaussian_noise(img, sigma)
+
 # img_noisy = cv2.imread('matlab_official_compare/noisy_image.png', cv2.IMREAD_GRAYSCALE)
 
 img_noisy_p = symetrize(img_noisy, nHard)
@@ -40,3 +43,8 @@ img_denoised = bm3d_2nd_step(sigma, img_noisy_p, img_basic_p, nWien, kWien, NWie
 img_denoised = img_denoised[nWien: -nWien, nWien: -nWien]
 
 cv2.imwrite('img_denoised.png', img_denoised)
+
+psnr_1st = compute_psnr(img, img_basic)
+psnr_2st = compute_psnr(img, img_denoised)
+print('img and img_basic PSNR: ', psnr_1st)
+print('img and img_denoised PSNR: ', psnr_2st)

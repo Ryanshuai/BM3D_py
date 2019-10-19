@@ -25,8 +25,8 @@ def precompute_BM(img, kHW, NHW, nHW, tauMatch):
     sum_table_T = sum_table.transpose((1, 0))  # ph_pw__di_dj
 
     argsort = np.argsort(sum_table_T, axis=1)[:, :NHW]
-    argsort_di = argsort // (Ns) - nHW
-    argsort_dj = argsort % (Ns) - nHW
+    argsort_di = argsort // Ns - nHW
+    argsort_dj = argsort % Ns - nHW
     near_pi = argsort_di.reshape((height, width, -1)) + np.arange(height)[:, np.newaxis, np.newaxis]
     near_pj = argsort_dj.reshape((height, width, -1)) + np.arange(width)[np.newaxis, :, np.newaxis]
     ri_rj_N__ni_nj = np.concatenate((near_pi[:, :, :, np.newaxis], near_pj[:, :, :, np.newaxis]), axis=-1)

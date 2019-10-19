@@ -19,7 +19,7 @@ def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, useSD
     column_ind = ind_initialize(width - kWien + 1, nWien, pWien)
 
     kaiserWindow = get_kaiserWindow(kWien)
-    ri_rj_N__ni_nj, threshold_count = precompute_BM(img_noisy, kHW=kWien, NHW=NWien, nHW=nWien, tauMatch=tauMatch)
+    ri_rj_N__ni_nj, threshold_count = precompute_BM(img_basic, kHW=kWien, NHW=NWien, nHW=nWien, tauMatch=tauMatch)
     group_len = int(np.sum(threshold_count))
     group_3D_table = np.zeros((group_len, kWien, kWien))
     weight_table = np.ones((height, width))
@@ -42,12 +42,7 @@ def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, useSD
             nSx_r = threshold_count[i_r, j_r]
             group_3D_img = build_3D_group(fre_noisy_patches, ri_rj_N__ni_nj[i_r, j_r], nSx_r)
             group_3D_est = build_3D_group(fre_basic_patches, ri_rj_N__ni_nj[i_r, j_r], nSx_r)
-            group_3D_img = group_3D_img.reshape(kWien * kWien, nSx_r)
-            group_3D_est = group_3D_est.reshape(kWien * kWien, nSx_r)
-
             group_3D, weight = wiener_filtering_hadamard(group_3D_img, group_3D_est, sigma, not useSD)
-
-            group_3D = group_3D.reshape(kWien, kWien, nSx_r)
             group_3D = group_3D.transpose((2, 0, 1))
 
             group_3D_table[acc_pointer:acc_pointer + nSx_r] = group_3D

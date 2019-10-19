@@ -13,7 +13,7 @@ def wiener_filtering_hadamard(group_3D_img, group_3D_est, sigma, doWeight):
     value = np.power(group_3D_est_h, 2) * coef
     value /= (value + sigma * sigma)
     group_3D_est_h = group_3D_img_h * value * coef
-    weight = sum(value)
+    weight = np.sum(value)
 
     group_3D_est = hadamard_transform(group_3D_est_h)
 
