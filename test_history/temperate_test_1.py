@@ -1,10 +1,8 @@
 import numpy as np
 
-height = 10
-h = np.arange(height)[:, np.newaxis]
-print(h)
-
-width = 5
-w = np.arange(width)[np.newaxis, :]
-print(w)
-
+b_dim = 5
+a =  list(range(b_dim))
+a[-1], a[-2] = a[-2], a[-1]
+print(a)
+# t_axis = tuple(())
+# print(t_axis)

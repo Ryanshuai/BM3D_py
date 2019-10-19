@@ -20,8 +20,7 @@ kWien = 8
 NWien = 16
 pWien = 3
 useSD_w = True
-# tau_2D_wien = 'DCT'
-tau_2D_wien = 'BIOR'
+tau_2D_wien = 'DCT'
 # <\ hyper parameter> -----------------------------------------------------------------------------
 
 
