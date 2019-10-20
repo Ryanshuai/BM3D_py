@@ -123,7 +123,6 @@ def get_coef(kHW):
     return coef_norm, coef_norm_inv
 
 
-
 def sd_weighting(group_3D):
     N = group_3D.size
 
