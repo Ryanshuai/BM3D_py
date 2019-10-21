@@ -10,10 +10,8 @@ from build_3D_group import build_3D_group
 from wiener_filtering_hadamard import wiener_filtering_hadamard
 
 
-def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, useSD, tau_2D):
+def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, tauMatch, useSD, tau_2D):
     height, width = img_noisy.shape[0], img_noisy.shape[1]
-
-    tauMatch = 400 if sigma < 35 else 3500  # ! threshold determinates similarity between patches
 
     row_ind = ind_initialize(height - kWien + 1, nWien, pWien)
     column_ind = ind_initialize(width - kWien + 1, nWien, pWien)

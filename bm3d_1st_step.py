@@ -10,11 +10,8 @@ from build_3D_group import build_3D_group
 from ht_filtering_hadamard import ht_filtering_hadamard
 
 
-def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, useSD, tau_2D):
+def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, lambdaHard3D, tauMatch, useSD, tau_2D):
     height, width = img_noisy.shape[0], img_noisy.shape[1]
-
-    lambdaHard3D = 2.7  # ! Threshold for Hard Thresholding
-    tauMatch = 3 * (2500 if sigma < 35 else 5000)  # ! threshold determinates similarity between patches
 
     row_ind = ind_initialize(height - kHard + 1, nHard, pHard)
     column_ind = ind_initialize(width - kHard + 1, nHard, pHard)
