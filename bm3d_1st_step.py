@@ -27,7 +27,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, lambdaHard3D, ta
         fre_all_patches = dct_2d_forward(all_patches)
     else:  # 'BIOR'
         fre_all_patches = bior_2d_forward(all_patches)
-    fre_all_patches = fre_all_patches.reshape((height-kHard+1, height-kHard+1, kHard, kHard))
+    fre_all_patches = fre_all_patches.reshape((height - kHard + 1, height - kHard + 1, kHard, kHard))
 
     acc_pointer = 0
     for i_r in row_ind:
@@ -76,8 +76,8 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, lambdaHard3D, ta
                 ni, nj = N_ni_nj[n]
                 patch = group_3D[n]
 
-                numerator[ni:ni+kHard, nj:nj+kHard] += patch * weight
-                denominator[ni:ni+kHard, nj:nj+kHard] += kaiserWindow * weight
+                numerator[ni:ni + kHard, nj:nj + kHard] += patch * weight
+                denominator[ni:ni + kHard, nj:nj + kHard] += kaiserWindow * weight
 
     img_basic= numerator / denominator
     return img_basic
