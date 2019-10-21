@@ -6,7 +6,9 @@ def symetrize(img, N):
     return img_pad
 
 
-def add_gaussian_noise(im, sigma):
+def add_gaussian_noise(im, sigma, seed=None):
+    if seed is not None:
+        np.random.seed(seed)
     im_h, im_w = im.shape
     im = im + (sigma * np.random.randn(im_h, im_w)).astype(np.int)
     im = np.clip(im, 0, 255, out=None)
@@ -46,12 +48,8 @@ def get_kaiserWindow(kHW):
                 kaiserWindow[i + kHW * j] = kaiserWindow[i + kHW * (kHW - j - 1)]
 
         for i in range(kHW // 2, kHW):
-            for j in range(kHW // 2):
+            for j in range(kHW):
                 kaiserWindow[i + kHW * j] = kaiserWindow[kHW - i - 1 + kHW * j]
-
-        for i in range(kHW // 2, kHW):
-            for j in range(kHW // 2, kHW):
-                kaiserWindow[i + kHW * j] = kaiserWindow[kHW - i - 1 + kHW * (kHW - j - 1)]
 
     elif kHW == 12:
         kaiserWindow[0 + kHW * 0] = 0.1924
@@ -96,12 +94,8 @@ def get_kaiserWindow(kHW):
                 kaiserWindow[i + kHW * j] = kaiserWindow[i + kHW * (kHW - j - 1)]
 
         for i in range(kHW // 2, kHW):
-            for j in range(kHW // 2):
+            for j in range(kHW):
                 kaiserWindow[i + kHW * j] = kaiserWindow[kHW - i - 1 + kHW * j]
-
-        for i in range(kHW // 2, kHW):
-            for j in range(kHW // 2, kHW):
-                kaiserWindow[i + kHW * j] = kaiserWindow[kHW - i - 1 + kHW * (kHW - j - 1)]
 
     else:
         for k in range(kHW * kHW):
