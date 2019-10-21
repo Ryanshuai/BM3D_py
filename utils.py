@@ -49,6 +49,10 @@ def get_kaiserWindow(kHW):
             for j in range(kHW // 2):
                 kaiserWindow[i + kHW * j] = kaiserWindow[kHW - i - 1 + kHW * j]
 
+        for i in range(kHW // 2, kHW):
+            for j in range(kHW // 2, kHW):
+                kaiserWindow[i + kHW * j] = kaiserWindow[kHW - i - 1 + kHW * (kHW - j - 1)]
+
     elif kHW == 12:
         kaiserWindow[0 + kHW * 0] = 0.1924
         kaiserWindow[0 + kHW * 1] = 0.2615
@@ -95,6 +99,10 @@ def get_kaiserWindow(kHW):
             for j in range(kHW // 2):
                 kaiserWindow[i + kHW * j] = kaiserWindow[kHW - i - 1 + kHW * j]
 
+        for i in range(kHW // 2, kHW):
+            for j in range(kHW // 2, kHW):
+                kaiserWindow[i + kHW * j] = kaiserWindow[kHW - i - 1 + kHW * (kHW - j - 1)]
+
     else:
         for k in range(kHW * kHW):
             kaiserWindow[k] = 1.0
@@ -123,7 +131,6 @@ def get_coef(kHW):
     return coef_norm, coef_norm_inv
 
 
-
 def sd_weighting(group_3D):
     N = group_3D.size
 
@@ -133,3 +140,8 @@ def sd_weighting(group_3D):
     res = (std - mean * mean / N) / (N - 1)
     weight = 1.0 / np.sqrt(res) if res > 0. else 0.
     return weight
+
+
+if __name__ == '__main__':
+   kaiser = get_kaiserWindow(12)
+   print()

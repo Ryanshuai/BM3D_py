@@ -62,8 +62,8 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, lambdaHard3D, ta
 
     group_3D_table *= kaiserWindow
 
-    numerator = np.zeros_like(img_noisy, dtype=np.float)
-    denominator = np.zeros_like(img_noisy, dtype=np.float)
+    numerator = np.zeros_like(img_noisy, dtype=np.float64)
+    denominator = np.zeros_like(img_noisy, dtype=np.float64)
     acc_pointer = 0
     for i_r in row_ind:
         for j_r in column_ind:
@@ -80,7 +80,6 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, lambdaHard3D, ta
                 denominator[ni:ni+kHard, nj:nj+kHard] += kaiserWindow * weight
 
     img_basic= numerator / denominator
-    img_basic = img_basic.astype(np.uint8)
     return img_basic
 
 
@@ -88,15 +87,16 @@ if __name__ == '__main__':
     from utils import add_gaussian_noise, symetrize
 
     # <hyper parameter> -------------------------------------------------------------------------------
-    sigma = 25
+    sigma = 20
 
     nHard = 16
     kHard = 8
     NHard = 16
     pHard = 3
+    lambdaHard3D = 2.7  # ! Threshold for Hard Thresholding
+    tauMatchHard = 2500 if sigma < 35 else 5000  # ! threshold determinates similarity between patches
     useSD_h = False
     tau_2D_hard = 'BIOR'
-
     # <\ hyper parameter> -----------------------------------------------------------------------------
 
     img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
@@ -105,7 +105,8 @@ if __name__ == '__main__':
     img_noisy = cv2.imread('matlab_official_compare/noisy_image.png', cv2.IMREAD_GRAYSCALE)
 
     img_noisy_p = symetrize(img_noisy, nHard)
-    img_basic = bm3d_1st_step(sigma, img_noisy_p, nHard, kHard, NHard, pHard, useSD_h, tau_2D_hard)
+    img_basic = bm3d_1st_step(sigma, img_noisy_p, nHard, kHard, NHard, pHard, lambdaHard3D, tauMatchHard, useSD_h,
+                              tau_2D_hard)
     img_basic = img_basic[nHard: -nHard, nHard: -nHard]
 
-    cv2.imwrite('img_basic.png', img_basic)
+    # cv2.imwrite('y_basic.png', img_basic.astype(np.uint8))
