@@ -9,9 +9,11 @@ im_dir = '../test_data/image'
 sigma_list = [2, 5, 10, 20, 30, 40, 60, 80, 100]
 
 
-for i, im_name in enumerate(os.listdir(im_dir)):
+for i, im_name in enumerate(sorted(os.listdir(im_dir))):
     im = cv2.imread(os.path.join(im_dir, im_name))
-
+    print(i, im_name)
+    if (i >= 10):
+        break
     f_p_c_1 = list()
     u_p_c_1 = list()
     f_p_c_2 = list()
@@ -75,8 +77,4 @@ for i, im_name in enumerate(os.listdir(im_dir)):
     plt.legend()
     plt.savefig(im_name)
     plt.show()
-
-    if i > 0:
-        break
-
 
