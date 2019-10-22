@@ -27,7 +27,7 @@ if __name__ == '__main__':
     import cv2
     import numpy as np
 
-    sigma_list = [40, 60, 80, 100]
+    sigma_list = [60]
 
     for sigma in sigma_list:
 
