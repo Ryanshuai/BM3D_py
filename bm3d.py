@@ -24,46 +24,47 @@ if __name__ == '__main__':
     import cv2
     import numpy as np
 
-    sigma_list = [2, 5, 10, 20, 30, 40, 60, 80, 100]
-    sigma = sigma_list[0]
+    sigma_list = [5, 10, 20, 30, 40, 60, 80, 100]
 
-    # <hyper parameter> -------------------------------------------------------------------------------
-    n_H = 16
-    k_H = 8
-    N_H = 16
-    p_H = 3
-    lambda3D_H = 2.7  # ! Threshold for Hard Thresholding
-    tauMatch_H = 2500 if sigma < 35 else 5000  # ! threshold determinates similarity between patches
-    useSD_H = False
-    tau_2D_H = 'BIOR'
+    for sigma in sigma_list:
 
-    n_W = 16
-    k_W = 8
-    N_W = 32
-    p_W = 3
-    tauMatch_W = 400 if sigma < 35 else 3500  # ! threshold determinates similarity between patches
-    useSD_W = True
-    tau_2D_W = 'DCT'
-    # <\ hyper parameter> -----------------------------------------------------------------------------
+        # <hyper parameter> -------------------------------------------------------------------------------
+        n_H = 16
+        k_H = 8
+        N_H = 16
+        p_H = 3
+        lambda3D_H = 2.7  # ! Threshold for Hard Thresholding
+        tauMatch_H = 2500 if sigma < 35 else 5000  # ! threshold determinates similarity between patches
+        useSD_H = False
+        tau_2D_H = 'BIOR'
 
-    im_dir = 'test_data/image'
-    noisy_dir = 'test_data/sigma' + str(sigma)
-    save_dir = 'result_compare/sigma' + str(sigma)
-    for im_name in os.listdir(im_dir):
-        print(im_name)
-        im_path = os.path.join(im_dir, im_name)
-        im = cv2.imread(im_path, cv2.IMREAD_GRAYSCALE)
-        noisy_im_path = os.path.join(noisy_dir, im_name)
-        noisy_im = cv2.imread(noisy_im_path, cv2.IMREAD_GRAYSCALE)
+        n_W = 16
+        k_W = 8
+        N_W = 32
+        p_W = 3
+        tauMatch_W = 400 if sigma < 35 else 3500  # ! threshold determinates similarity between patches
+        useSD_W = True
+        tau_2D_W = 'DCT'
+        # <\ hyper parameter> -----------------------------------------------------------------------------
 
-        im1, im2 = run_bm3d(noisy_im, sigma,
-                            n_H, k_H, N_H, p_H, tauMatch_H, useSD_H, tau_2D_H, lambda3D_H,
-                            n_W, k_W, N_W, p_W, tauMatch_W, useSD_W, tau_2D_W)
+        im_dir = 'test_data/image'
+        noisy_dir = 'test_data/sigma' + str(sigma)
+        save_dir = 'result_compare/sigma' + str(sigma)
+        for im_name in os.listdir(im_dir):
+            print(im_name)
+            im_path = os.path.join(im_dir, im_name)
+            im = cv2.imread(im_path, cv2.IMREAD_GRAYSCALE)
+            noisy_im_path = os.path.join(noisy_dir, im_name)
+            noisy_im = cv2.imread(noisy_im_path, cv2.IMREAD_GRAYSCALE)
 
-        psnr_1st = compute_psnr(im, im1)
-        psnr_2nd = compute_psnr(im, im2)
+            im1, im2 = run_bm3d(noisy_im, sigma,
+                                n_H, k_H, N_H, p_H, tauMatch_H, useSD_H, tau_2D_H, lambda3D_H,
+                                n_W, k_W, N_W, p_W, tauMatch_W, useSD_W, tau_2D_W)
 
-        save_name = im_name[:-4] + '_s' + str(sigma) + '_py_1st_P' + str(round(psnr_1st, 3)) + '.png'
-        cv2.imwrite(os.path.join(save_dir, save_name), im1.astype(np.uint8))
-        save_name = im_name[:-4] + '_s' + str(sigma) + '_py_2nd_P' + str(round(psnr_2nd, 3)) + '.png'
-        cv2.imwrite(os.path.join(save_dir, save_name), im2.astype(np.uint8))
+            psnr_1st = compute_psnr(im, im1)
+            psnr_2nd = compute_psnr(im, im2)
+
+            save_name = im_name[:-4] + '_s' + str(sigma) + '_py_1st_P' + str(round(psnr_1st, 3)) + '.png'
+            cv2.imwrite(os.path.join(save_dir, save_name), im1.astype(np.uint8))
+            save_name = im_name[:-4] + '_s' + str(sigma) + '_py_2nd_P' + str(round(psnr_2nd, 3)) + '.png'
+            cv2.imwrite(os.path.join(save_dir, save_name), im2.astype(np.uint8))
