@@ -22,6 +22,7 @@ def run_bm3d(noisy_im, sigma,
 if __name__ == '__main__':
     import os
     import cv2
+    import numpy as np
 
     sigma_list = [2, 5, 10, 20, 30, 40, 60, 80, 100]
     sigma = sigma_list[0]
@@ -63,6 +64,6 @@ if __name__ == '__main__':
         psnr_2nd = compute_psnr(im, im2)
 
         save_name = im_name[:-4] + '_s' + str(sigma) + '_py_1st_P' + str(round(psnr_1st, 3)) + '.png'
-        cv2.imwrite(os.path.join(save_dir, save_name), im1)
+        cv2.imwrite(os.path.join(save_dir, save_name), im1.astype(np.uint8))
         save_name = im_name[:-4] + '_s' + str(sigma) + '_py_2nd_P' + str(round(psnr_2nd, 3)) + '.png'
-        cv2.imwrite(os.path.join(save_dir, save_name), im2)
+        cv2.imwrite(os.path.join(save_dir, save_name), im2.astype(np.uint8))
