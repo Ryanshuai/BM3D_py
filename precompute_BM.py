@@ -2,7 +2,7 @@ import numpy as np
 
 
 def precompute_BM(img, kHW, NHW, nHW, tauMatch):
-    img = img.astype(np.int)
+    img = img.astype(np.float64)
     height, width = img.shape
     Ns = 2 * nHW + 1
     threshold = tauMatch * kHW * kHW

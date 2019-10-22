@@ -11,7 +11,7 @@ def add_gaussian_noise(im, sigma, seed=None):
         np.random.seed(seed)
     im_h, im_w = im.shape
     im = im + (sigma * np.random.randn(im_h, im_w)).astype(np.int)
-    im = np.clip(im, 0, 255, out=None)
+    im = np.clip(im, 0., 255., out=None)
     im = im.astype(np.uint8)
     return im
 

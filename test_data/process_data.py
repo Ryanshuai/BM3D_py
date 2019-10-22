@@ -19,10 +19,13 @@ for im_name in os.listdir(input_path):
         else:
             im = im[-w:, :]
 
+    if min(h, w) > 256:
+        im = cv2.resize(im, (256, 256))
+
     os.makedirs('image', exist_ok=True)
-    cv2.imwrite('image/' + im_name[:-4] + '_' + str(min(h, w)) + '.png', im)
+    cv2.imwrite('image/' + im_name[:-4] + '.png', im)
 
     for sigma in [2, 5, 10, 20, 30, 40, 60, 80, 100]:
         os.makedirs('sigma' + str(sigma), exist_ok=True)
         im_noise = add_gaussian_noise(im, sigma, seed=0)
-        cv2.imwrite('sigma' + str(sigma) + '/' + im_name[:-4] + '_' + str(min(h, w)) + '.png', im_noise)
+        cv2.imwrite('sigma' + str(sigma) + '/' + im_name[:-4] + '.png', im_noise)
