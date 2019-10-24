@@ -27,7 +27,7 @@ if __name__ == '__main__':
     import cv2
     import numpy as np
 
-    sigma_list = [60]
+    sigma_list = [2, 5, 10, 20, 30, 40, 60, 80, 100]
 
     for sigma in sigma_list:
 
@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
         im_dir = 'test_data/image'
         noisy_dir = 'test_data/sigma' + str(sigma)
-        save_dir = 'result_compare/sigma' + str(sigma)
+        save_dir = 'result_compare/python'
         for im_name in os.listdir(im_dir):
             print(im_name)
             im_path = os.path.join(im_dir, im_name)
@@ -67,7 +67,12 @@ if __name__ == '__main__':
             psnr_1st = compute_psnr(im, im1)
             psnr_2nd = compute_psnr(im, im2)
 
+            im1 = np.clip(im1, 0, 255)
+            im2 = np.clip(im2, 0, 255)
+            im1 = im1.astype(im1)
+            im2 = im1.astype(im2)
+
             save_name = im_name[:-4] + '_s' + str(sigma) + '_py_1st_P' + str(round(psnr_1st, 3)) + '.png'
-            cv2.imwrite(os.path.join(save_dir, save_name), im1.astype(np.uint8))
+            cv2.imwrite(os.path.join(save_dir, save_name), im1)
             save_name = im_name[:-4] + '_s' + str(sigma) + '_py_2nd_P' + str(round(psnr_2nd, 3)) + '.png'
-            cv2.imwrite(os.path.join(save_dir, save_name), im2.astype(np.uint8))
+            cv2.imwrite(os.path.join(save_dir, save_name), im2)
