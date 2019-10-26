@@ -69,8 +69,8 @@ if __name__ == '__main__':
 
             im1 = np.clip(im1, 0, 255)
             im2 = np.clip(im2, 0, 255)
-            im1 = im1.astype(im1)
-            im2 = im1.astype(im2)
+            im1 = im1.astype(np.uint8)
+            im2 = im2.astype(np.uint8)
 
             save_name = im_name[:-4] + '_s' + str(sigma) + '_py_1st_P' + str(round(psnr_1st, 3)) + '.png'
             cv2.imwrite(os.path.join(save_dir, save_name), im1)
