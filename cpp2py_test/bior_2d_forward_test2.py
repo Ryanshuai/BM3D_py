@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
     img = img.astype(np.float64)
-    img = img[0:8, 0:8]
+    # img = img[0:8, 0:8]
 
     # original way
     original_bior_img = original_bior_2d_forward(img)

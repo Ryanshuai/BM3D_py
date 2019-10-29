@@ -28,7 +28,6 @@ if __name__ == '__main__':
     import numpy as np
 
     sigma_list = [2, 5, 10, 20, 30, 40, 60, 80, 100]
-
     for sigma in sigma_list:
 
         # <hyper parameter> -------------------------------------------------------------------------------
@@ -72,7 +71,7 @@ if __name__ == '__main__':
             im1 = im1.astype(np.uint8)
             im2 = im2.astype(np.uint8)
 
-            save_name = im_name[:-4] + '_s' + str(sigma) + '_py_1st_P' + str(round(psnr_1st, 3)) + '.png'
+            save_name = im_name[:-4] + '_s' + str(sigma) + '_py_1st_P' + '%.3f' % psnr_1st + '.png'
             cv2.imwrite(os.path.join(save_dir, save_name), im1)
-            save_name = im_name[:-4] + '_s' + str(sigma) + '_py_2nd_P' + str(round(psnr_2nd, 3)) + '.png'
+            save_name = im_name[:-4] + '_s' + str(sigma) + '_py_2nd_P' + '%.3f' % psnr_2nd + '.png'
             cv2.imwrite(os.path.join(save_dir, save_name), im2)

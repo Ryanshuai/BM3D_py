@@ -24,9 +24,9 @@ def original_bior_2d_forward_(output, N, lpd, hpd):
     S_2 = S_1 // 2 - 1
     tmp = np.zeros(N_1 + 2 * S_2)
     ind_per = np.zeros(N_1 + 2 * S_2, dtype=np.int)
-    per_ext_ind(ind_per, N_1, S_2)
 
     for iter in range(0, iter_max):
+        per_ext_ind(ind_per, N_1, S_2)
         for i in range(N_1):
             for j in range(len(tmp)):
                 tmp[j] = output[i * N + ind_per[j]]
@@ -126,11 +126,11 @@ if __name__ == '__main__':
     img = img.astype(np.float64)
 
     # # original way
-    # img_flat = img.flatten()
-    # N = int(math.sqrt(len(img_flat)))
-    # lpd, hpd, lpr, hpr = bior15_coef()
-    # original_bior_2d_forward_(img_flat, N, lpd, hpd)
-    # original_bior_img = img_flat.reshape(N, N)
+    img_flat = img.flatten()
+    N = int(math.sqrt(len(img_flat)))
+    lpd, hpd, lpr, hpr = bior15_coef()
+    original_bior_2d_forward_(img_flat, N, lpd, hpd)
+    original_bior_img = img_flat.reshape(N, N)
 
     # my way
     coeffs2 = pywt.dwt2(img, 'bior1.5', mode='periodization')

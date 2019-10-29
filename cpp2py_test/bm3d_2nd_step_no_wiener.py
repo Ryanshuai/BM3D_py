@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+from scipy.linalg import hadamard
 
 from utils import ind_initialize, get_kaiserWindow, sd_weighting
 from precompute_BM import precompute_BM
@@ -7,7 +8,33 @@ from bior_2d import bior_2d_forward, bior_2d_reverse
 from dct_2d import dct_2d_forward, dct_2d_reverse
 from image_to_patches import image2patches
 from build_3D_group import build_3D_group
-from wiener_filtering_hadamard import wiener_filtering_hadamard
+
+
+def wiener_filtering_hadamard(group_3D_img, group_3D_est, sigma, doWeight):
+    assert group_3D_img.shape == group_3D_est.shape
+    nSx_r = group_3D_img.shape[-1]
+    coef = 1.0 / nSx_r
+
+    group_3D_img_h = hadamard_transform(group_3D_img)  # along nSx_r axis
+    group_3D_est_h = hadamard_transform(group_3D_est)
+
+    value = np.power(group_3D_est_h, 2) * coef
+    value /= (value + sigma * sigma)
+    weight = np.sum(value)
+
+    group_3D_est = hadamard_transform(group_3D_est_h)
+
+    if doWeight:
+        weight = 1. / (sigma * sigma * weight) if weight > 0. else 1.
+
+    return group_3D_est, weight
+
+
+def hadamard_transform(vec):
+    n = vec.shape[-1]
+    h_mat = hadamard(n).astype(np.float64)
+    v_h = vec @ h_mat
+    return v_h
 
 
 def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, tauMatch, useSD, tau_2D):
@@ -70,6 +97,7 @@ def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, tauMa
     acc_pointer = 0
     for i_r in row_ind:
         for j_r in column_ind:
+
             nSx_r = threshold_count[i_r, j_r]
             N_ni_nj = ri_rj_N__ni_nj[i_r, j_r]
             group_3D = group_3D_table[acc_pointer:acc_pointer + nSx_r]
@@ -102,16 +130,18 @@ if __name__ == '__main__':
     tau_2D_wien = 'DCT'
     # <\ hyper parameter> -----------------------------------------------------------------------------
 
-    img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
-    img_noisy = cv2.imread('image_noise.png', cv2.IMREAD_GRAYSCALE)
     img_basic = cv2.imread('y_basic.png', cv2.IMREAD_GRAYSCALE)
 
     img_basic_p = symetrize(img_basic, nWien)
-    img_noisy_p = symetrize(img_noisy, nWien)
+    img_noisy_p = symetrize(img_basic, nWien)
     img_denoised = bm3d_2nd_step(sigma, img_noisy_p, img_basic_p, nWien, kWien, NWien, pWien, tauMatchWien, useSD_w,
                                  tau_2D_wien)
     img_denoised = img_denoised[nWien: -nWien, nWien: -nWien]
 
-    psnr_2st = compute_psnr(img, img_denoised)
-    print('img and img_denoised PSNR: ', psnr_2st)
-    # cv2.imwrite('y_final.png', img_denoised.astype(np.uint8))
+    cv2.imshow('img_denoised', img_denoised)
+    diff = np.abs(img_basic - img_denoised)
+    print('sum of diff', np.sum(diff))
+    print('max of diff', np.max(diff))
+    cv2.imshow('diff', diff)
+    cv2.waitKey()
+

@@ -66,8 +66,8 @@ def compare_psnr(im_name):
     l2 = plt.plot(sigma_list, u_p_p_2, 'b--', label='py_version')
 
     for x, cpp, py in zip(sigma_list, u_p_c_2, u_p_p_2):
-        plt.text(x, cpp, 'cpp' + '%.2f' % cpp, ha='center', va='top', fontsize=10, color='g')
-        plt.text(x, py, 'py' + '%.2f' % py, ha='center', va='bottom', fontsize=10, color='b')
+        plt.text(x, cpp, 'cpp' + '%.3f' % cpp, ha='center', va='top', fontsize=10, color='g')
+        plt.text(x, py, 'py' + '%.3f' % py, ha='center', va='bottom', fontsize=10, color='b')
     plt.rcParams['savefig.dpi'] = 300  # 图片像素
     plt.rcParams['figure.dpi'] = 300  # 分辨率
     plt.title(im_name)
@@ -81,11 +81,10 @@ def compare_psnr(im_name):
 if __name__ == '__main__':
     im_name_list = ['Alley.png', 'Baboon.png', 'barbara.png', 'boat.png', 'Book.png', 'Building1.png', 'Building2.png',
                     'Cameraman.png', 'Computer.png', 'couple.png', 'Dice.png', 'F16.png', 'fingerprint.png',
-                    'Flowers1.png',
-                    'Flowers2.png', 'Gardens.png', 'Girl.png', 'Hallway.png', 'hill.png', 'house.png', 'Lena.png',
-                    'man.png', 'Man1.png', 'Man2.png', 'montage.png', 'pentagon.png', 'peppers.png', 'Plaza.png',
-                    'Statue.png', 'Street1.png', 'Street2.png', 'Traffic.png', 'Trees.png', 'Valldemossa.png',
-                    'Yard.png']
+                    'Flowers1.png', 'Flowers2.png', 'Gardens.png', 'Girl.png', 'Hallway.png', 'hill.png', 'house.png',
+                    'Lena.png', 'man.png', 'Man1.png', 'Man2.png', 'montage.png', 'pentagon.png', 'peppers.png',
+                    'Plaza.png', 'Statue.png', 'Street1.png', 'Street2.png', 'Traffic.png', 'Trees.png',
+                    'Valldemossa.png', 'Yard.png']
 
     for im_name in im_name_list:
         compare_psnr(im_name)
