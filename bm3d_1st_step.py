@@ -60,8 +60,6 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, lambdaHard3D, ta
     #     cv2.imshow('', patch.astype(np.uint8))
     #     cv2.waitKey()
 
-    group_3D_table *= kaiserWindow
-
     numerator = np.zeros_like(img_noisy, dtype=np.float64)
     denominator = np.zeros_like(img_noisy, dtype=np.float64)
     acc_pointer = 0
@@ -76,7 +74,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, lambdaHard3D, ta
                 ni, nj = N_ni_nj[n]
                 patch = group_3D[n]
 
-                numerator[ni:ni + kHard, nj:nj + kHard] += patch * weight
+                numerator[ni:ni + kHard, nj:nj + kHard] += patch * kaiserWindow * weight
                 denominator[ni:ni + kHard, nj:nj + kHard] += kaiserWindow * weight
 
     img_basic= numerator / denominator

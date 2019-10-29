@@ -20,6 +20,7 @@ def wiener_filtering_hadamard(group_3D_img, group_3D_est, sigma, doWeight):
 
     value = np.power(group_3D_est_h, 2) * coef
     value /= (value + sigma * sigma)
+    group_3D_est_h = group_3D_img_h * value * coef
     weight = np.sum(value)
 
     group_3D_est = hadamard_transform(group_3D_est_h)
@@ -28,7 +29,6 @@ def wiener_filtering_hadamard(group_3D_img, group_3D_est, sigma, doWeight):
         weight = 1. / (sigma * sigma * weight) if weight > 0. else 1.
 
     return group_3D_est, weight
-
 
 def hadamard_transform(vec):
     n = vec.shape[-1]
@@ -90,8 +90,6 @@ def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, tauMa
     #     cv2.imshow('', patch.astype(np.uint8))
     #     cv2.waitKey()
 
-    group_3D_table *= kaiserWindow
-
     numerator = np.zeros_like(img_noisy, dtype=np.float64)
     denominator = np.zeros_like(img_noisy, dtype=np.float64)
     acc_pointer = 0
@@ -107,7 +105,7 @@ def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, tauMa
                 ni, nj = N_ni_nj[n]
                 patch = group_3D[n]
 
-                numerator[ni:ni + kWien, nj:nj + kWien] += patch * weight
+                numerator[ni:ni + kWien, nj:nj + kWien] += patch * kaiserWindow * weight
                 denominator[ni:ni + kWien, nj:nj + kWien] += kaiserWindow * weight
 
     img_denoised = numerator / denominator
@@ -138,7 +136,7 @@ if __name__ == '__main__':
                                  tau_2D_wien)
     img_denoised = img_denoised[nWien: -nWien, nWien: -nWien]
 
-    cv2.imshow('img_denoised', img_denoised)
+    cv2.imshow('img_denoised', img_denoised.astype(np.uint8))
     diff = np.abs(img_basic - img_denoised)
     print('sum of diff', np.sum(diff))
     print('max of diff', np.max(diff))

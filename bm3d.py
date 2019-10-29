@@ -27,33 +27,35 @@ if __name__ == '__main__':
     import cv2
     import numpy as np
 
-    sigma_list = [2, 5, 10, 20, 30, 40, 60, 80, 100]
-    for sigma in sigma_list:
 
-        # <hyper parameter> -------------------------------------------------------------------------------
-        n_H = 16
-        k_H = 8
-        N_H = 16
-        p_H = 3
-        lambda3D_H = 2.7  # ! Threshold for Hard Thresholding
-        tauMatch_H = 2500 if sigma < 35 else 5000  # ! threshold determinates similarity between patches
-        useSD_H = False
-        tau_2D_H = 'BIOR'
+    # <hyper parameter> -------------------------------------------------------------------------------
+    n_H = 16
+    k_H = 8
+    N_H = 16
+    p_H = 3
+    lambda3D_H = 2.7  # ! Threshold for Hard Thresholding
+    useSD_H = False
+    tau_2D_H = 'BIOR'
 
-        n_W = 16
-        k_W = 8
-        N_W = 32
-        p_W = 3
-        tauMatch_W = 400 if sigma < 35 else 3500  # ! threshold determinates similarity between patches
-        useSD_W = True
-        tau_2D_W = 'DCT'
-        # <\ hyper parameter> -----------------------------------------------------------------------------
+    n_W = 16
+    k_W = 8
+    N_W = 32
+    p_W = 3
+    useSD_W = True
+    tau_2D_W = 'DCT'
+    # <\ hyper parameter> -----------------------------------------------------------------------------
 
-        im_dir = 'test_data/image'
-        noisy_dir = 'test_data/sigma' + str(sigma)
-        save_dir = 'result_compare/python'
-        for im_name in os.listdir(im_dir):
-            print(im_name)
+    im_dir = 'test_data/image'
+    save_dir = 'result_compare/python'
+    # for im_name in os.listdir(im_dir):
+    for im_name in ['Building1.png',]:
+        sigma_list = [2, 5, 10, 20, 30, 40, 60, 80, 100]
+        for sigma in sigma_list:
+            print(im_name, '  ', sigma)
+            tauMatch_H = 2500 if sigma < 35 else 5000  # ! threshold determinates similarity between patches
+            tauMatch_W = 400 if sigma < 35 else 3500  # ! threshold determinates similarity between patches
+            noisy_dir = 'test_data/sigma' + str(sigma)
+
             im_path = os.path.join(im_dir, im_name)
             im = cv2.imread(im_path, cv2.IMREAD_GRAYSCALE)
             noisy_im_path = os.path.join(noisy_dir, im_name)

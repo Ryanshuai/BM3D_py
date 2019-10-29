@@ -82,9 +82,15 @@ if __name__ == '__main__':
     im_name_list = ['Alley.png', 'Baboon.png', 'barbara.png', 'boat.png', 'Book.png', 'Building1.png', 'Building2.png',
                     'Cameraman.png', 'Computer.png', 'couple.png', 'Dice.png', 'F16.png', 'fingerprint.png',
                     'Flowers1.png', 'Flowers2.png', 'Gardens.png', 'Girl.png', 'Hallway.png', 'hill.png', 'house.png',
-                    'Lena.png', 'man.png', 'Man1.png', 'Man2.png', 'montage.png', 'pentagon.png', 'peppers.png',
+                    'Lena.png', 'Man.png', 'Man1.png', 'Man2.png', 'montage.png', 'pentagon.png', 'peppers.png',
                     'Plaza.png', 'Statue.png', 'Street1.png', 'Street2.png', 'Traffic.png', 'Trees.png',
                     'Valldemossa.png', 'Yard.png']
 
+    im_name_list = ['Man1.png', 'Man2.png', 'montage.png', 'pentagon.png', 'peppers.png',
+                    'Plaza.png', 'Statue.png', 'Street1.png', 'Street2.png', 'Traffic.png', 'Trees.png',
+                    'Valldemossa.png', 'Yard.png']
+
+
     for im_name in im_name_list:
+        print(im_name)
         compare_psnr(im_name)

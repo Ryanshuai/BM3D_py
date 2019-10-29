@@ -63,8 +63,6 @@ def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, tauMa
     #     cv2.imshow('', patch.astype(np.uint8))
     #     cv2.waitKey()
 
-    group_3D_table *= kaiserWindow
-
     numerator = np.zeros_like(img_noisy, dtype=np.float64)
     denominator = np.zeros_like(img_noisy, dtype=np.float64)
     acc_pointer = 0
@@ -79,7 +77,7 @@ def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, tauMa
                 ni, nj = N_ni_nj[n]
                 patch = group_3D[n]
 
-                numerator[ni:ni + kWien, nj:nj + kWien] += patch * weight
+                numerator[ni:ni + kWien, nj:nj + kWien] += patch * kaiserWindow * weight
                 denominator[ni:ni + kWien, nj:nj + kWien] += kaiserWindow * weight
 
     img_denoised = numerator / denominator
