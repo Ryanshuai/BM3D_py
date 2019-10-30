@@ -1,7 +1,7 @@
 # BM3D
 This is a python implementation of BM3D.  
 [Matlab](http://www.cs.tut.fi/~foi/GCF-BM3D/)   version  
-We reference to this [cpp](https://www.ipol.im/pub/art/2012/l-bm3d/) version.
+We refer to this [CPP](https://www.ipol.im/pub/art/2012/l-bm3d/) version.
 
 ## Why python
 1. Easier to understand BM3D.  
