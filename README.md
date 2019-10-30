@@ -20,7 +20,7 @@ We reference to this [cpp](https://www.ipol.im/pub/art/2012/l-bm3d/) version.
 | ![](test_data/image/Building1.png) | ![](result_compare/Building1.png) |
 | ![](test_data/image/Building2.png) | ![](result_compare/Building2.png) |
 | ![](test_data/image/Cameraman.png) | ![](result_compare/Cameraman.png) |
-| ![](test_data/image/Computer.png) | ![](result_compare/Computer.png |
+| ![](test_data/image/Computer.png) | ![](result_compare/Computer.png) |
 | ![](test_data/image/couple.png) | ![](result_compare/couple.png) |
 | ![](test_data/image/Dice.png) | ![](result_compare/Dice.png) |
 | ![](test_data/image/F16.png) | ![](result_compare/F16.png) |
@@ -33,7 +33,7 @@ We reference to this [cpp](https://www.ipol.im/pub/art/2012/l-bm3d/) version.
 | ![](test_data/image/hill.png) | ![](result_compare/hill.png) |
 | ![](test_data/image/house.png) | ![](result_compare/house.png) |
 | ![](test_data/image/Lena.png) | ![](result_compare/Lena.png) |
-| ![](test_data/image/Man.png) | ![](result_compare/Man.png |
+| ![](test_data/image/Man.png) | ![](result_compare/Man.png) |
 | ![](test_data/image/Man1.png) | ![](result_compare/Man1.png) |
 | ![](test_data/image/Man2.png) | ![](result_compare/Man2.png) |
 | ![](test_data/image/montage.png) | ![](result_compare/montage.png) |
