@@ -47,8 +47,8 @@ if __name__ == '__main__':
 
     im_dir = 'test_data/image'
     save_dir = 'result_compare/python'
-    # for im_name in os.listdir(im_dir):
-    for im_name in ['Building1.png',]:
+    for im_name in os.listdir(im_dir):
+    # for im_name in ['Man.png',]:
         sigma_list = [2, 5, 10, 20, 30, 40, 60, 80, 100]
         for sigma in sigma_list:
             print(im_name, '  ', sigma)

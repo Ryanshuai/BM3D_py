@@ -86,11 +86,6 @@ if __name__ == '__main__':
                     'Plaza.png', 'Statue.png', 'Street1.png', 'Street2.png', 'Traffic.png', 'Trees.png',
                     'Valldemossa.png', 'Yard.png']
 
-    im_name_list = ['Man1.png', 'Man2.png', 'montage.png', 'pentagon.png', 'peppers.png',
-                    'Plaza.png', 'Statue.png', 'Street1.png', 'Street2.png', 'Traffic.png', 'Trees.png',
-                    'Valldemossa.png', 'Yard.png']
-
-
     for im_name in im_name_list:
         print(im_name)
         compare_psnr(im_name)
