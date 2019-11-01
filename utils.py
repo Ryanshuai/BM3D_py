@@ -9,12 +9,10 @@ def symetrize(img, N):
 def add_gaussian_noise(im, sigma, seed=None):
     if seed is not None:
         np.random.seed(seed)
-    im_h, im_w = im.shape
-    im = im + (sigma * np.random.randn(im_h, im_w)).astype(np.int)
+    im = im + (sigma * np.random.randn(*im.shape)).astype(np.int)
     im = np.clip(im, 0., 255., out=None)
     im = im.astype(np.uint8)
     return im
-
 
 def ind_initialize(max_size, N, step):
     ind = range(N, max_size - N, step)
