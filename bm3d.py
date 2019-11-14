@@ -27,7 +27,6 @@ if __name__ == '__main__':
     import cv2
     import numpy as np
 
-
     # <hyper parameter> -------------------------------------------------------------------------------
     n_H = 16
     k_H = 8
@@ -46,10 +45,12 @@ if __name__ == '__main__':
     # <\ hyper parameter> -----------------------------------------------------------------------------
 
     im_dir = 'test_data/image'
-    save_dir = 'result_compare/python'
-    for im_name in os.listdir(im_dir):
-    # for im_name in ['Man.png',]:
-        sigma_list = [2, 5, 10, 20, 30, 40, 60, 80, 100]
+    save_dir = 'temp_test_result'
+    os.makedirs(save_dir, exist_ok=True)
+    # for im_name in os.listdir(im_dir):
+    for im_name in ['Cameraman.png',]:
+        # sigma_list = [2, 5, 10, 20, 30, 40, 60, 80, 100]
+        sigma_list = [20]
         for sigma in sigma_list:
             print(im_name, '  ', sigma)
             tauMatch_H = 2500 if sigma < 35 else 5000  # ! threshold determinates similarity between patches
@@ -68,12 +69,10 @@ if __name__ == '__main__':
             psnr_1st = compute_psnr(im, im1)
             psnr_2nd = compute_psnr(im, im2)
 
-            im1 = np.clip(im1, 0, 255)
-            im2 = np.clip(im2, 0, 255)
-            im1 = im1.astype(np.uint8)
-            im2 = im2.astype(np.uint8)
+            im1 = (np.clip(im1, 0, 255)).astype(np.uint8)
+            im2 = (np.clip(im2, 0, 255)).astype(np.uint8)
 
-            save_name = im_name[:-4] + '_s' + str(sigma) + '_py_1st_P' + '%.3f' % psnr_1st + '.png'
+            save_name = im_name[:-4] + '_s' + str(sigma) + '_py_1st_P' + '%.4f' % psnr_1st + '.png'
             cv2.imwrite(os.path.join(save_dir, save_name), im1)
-            save_name = im_name[:-4] + '_s' + str(sigma) + '_py_2nd_P' + '%.3f' % psnr_2nd + '.png'
+            save_name = im_name[:-4] + '_s' + str(sigma) + '_py_2nd_P' + '%.4f' % psnr_2nd + '.png'
             cv2.imwrite(os.path.join(save_dir, save_name), im2)

@@ -61,8 +61,10 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, lambdaHard3D, ta
     #     cv2.waitKey()
 
     numerator = np.zeros_like(img_noisy, dtype=np.float64)
-    denominator = np.zeros_like(img_noisy, dtype=np.float64)
+    denominator = np.zeros((img_noisy.shape[0] - 2 * nHard, img_noisy.shape[1] - 2 * nHard), dtype=np.float64)
+    denominator = np.pad(denominator, nHard, 'constant', constant_values=1.)
     acc_pointer = 0
+
     for i_r in row_ind:
         for j_r in column_ind:
             nSx_r = threshold_count[i_r, j_r]
@@ -77,7 +79,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, lambdaHard3D, ta
                 numerator[ni:ni + kHard, nj:nj + kHard] += patch * kaiserWindow * weight
                 denominator[ni:ni + kHard, nj:nj + kHard] += kaiserWindow * weight
 
-    img_basic= numerator / denominator
+    img_basic = numerator / denominator
     return img_basic
 
 
@@ -97,10 +99,9 @@ if __name__ == '__main__':
     tau_2D_hard = 'BIOR'
     # <\ hyper parameter> -----------------------------------------------------------------------------
 
-    img = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
-    # img = cv2.resize(img, (128, 128))
-    # img_noisy = add_gaussian_noise(img, sigma)
-    img_noisy = cv2.imread('matlab_official_compare/noisy_image.png', cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread('test_data/image/Cameraman.png', cv2.IMREAD_GRAYSCALE)
+    img_noisy = add_gaussian_noise(img, sigma)
+    # img_noisy = cv2.imread('matlab_officialfg_compare/noisy_image.png', cv2.IMREAD_GRAYSCALE)
 
     img_noisy_p = symetrize(img_noisy, nHard)
     img_basic = bm3d_1st_step(sigma, img_noisy_p, nHard, kHard, NHard, pHard, lambdaHard3D, tauMatchHard, useSD_h,
