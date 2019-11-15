@@ -26,14 +26,14 @@ def precompute_BM(img, kHW, NHW, nHW, tauMatch):
     argsort_dj = argsort % Ns - nHW
     near_pi = argsort_di.reshape((height, width, -1)) + np.arange(height)[:, np.newaxis, np.newaxis]
     near_pj = argsort_dj.reshape((height, width, -1)) + np.arange(width)[np.newaxis, :, np.newaxis]
-    near_pij = np.concatenate((near_pi[:, :, :, np.newaxis], near_pj[:, :, :, np.newaxis]), axis=-1)
+    ri_rj_N__ni_nj = np.concatenate((near_pi[:, :, :, np.newaxis], near_pj[:, :, :, np.newaxis]), axis=-1)
 
     sum_filter = np.where(sum_table_T < threshold, 1, 0)
     threshold_count = np.sum(sum_filter, axis=1)
     threshold_count = closest_power_of_2(threshold_count, max_=NHW)
     threshold_count = threshold_count.reshape((height, width))
 
-    return near_pij, threshold_count
+    return ri_rj_N__ni_nj, threshold_count
 
 
 def get_add_patch_matrix(n, nHW, kHW):
