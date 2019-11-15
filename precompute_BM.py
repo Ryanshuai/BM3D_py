@@ -6,20 +6,18 @@ def precompute_BM(img, kHW, NHW, nHW, tauMatch):
     height, width = img.shape
     Ns = 2 * nHW + 1
     threshold = tauMatch * kHW * kHW
-    sum_table = np.ones((Ns * Ns, height, width), dtype=np.int) * 2 * threshold  # di*width+dj, ph, pw
+    sum_table = np.ones((Ns, Ns, height, width)) * 2 * threshold  # di, dj, ph, pw
     add_mat = get_add_patch_matrix(width, nHW, kHW)
-    diff_margin = np.pad(np.ones((height - 2 * nHW, width - 2 * nHW)), ((nHW, nHW), (nHW, nHW)), 'constant',
-                         constant_values=(0, 0)).astype(np.uint8)
+    diff_margin = np.pad(np.ones((height - 2 * nHW, width - 2 * nHW)), nHW, 'constant',constant_values=0)
     sum_margin = (1 - diff_margin) * 2 * threshold
 
     for di in range(-nHW, nHW + 1):
         for dj in range(-nHW, nHW + 1):
-            ddk = (di + nHW) * Ns + dj + nHW
             t_img = translation_2d_mat(img, right=-dj, down=-di)
             diff_table_2 = (img - t_img) * (img - t_img) * diff_margin
 
-            sum_diff_2 = np.matmul(np.matmul(add_mat, diff_table_2), add_mat.T)
-            sum_table[ddk] = np.maximum(sum_diff_2, sum_margin)
+            sum_diff_2 = add_mat @ diff_table_2 @ add_mat.T
+            sum_table[di + nHW, dj + nHW] = np.maximum(sum_diff_2, sum_margin)  # sum_table (2n+1, 2n+1, height, width)
 
     sum_table = sum_table.reshape((Ns * Ns, height * width))  # di_dj, ph_pw
     sum_table_T = sum_table.transpose((1, 0))  # ph_pw__di_dj
