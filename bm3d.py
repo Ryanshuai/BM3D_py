@@ -14,6 +14,7 @@ def run_bm3d(noisy_im, sigma,
     img_basic = bm3d_1st_step(sigma, noisy_im_p, n_H, k_H, N_H, p_H, lambda3D_H, tauMatch_H, useSD_H, tau_2D_H)
     img_basic = img_basic[n_H: -n_H, n_H: -n_H]
 
+    assert not np.any(np.isnan(img_basic))
     img_basic_p = symetrize(img_basic, n_W)
     noisy_im_p = symetrize(noisy_im, n_W)
     img_denoised = bm3d_2nd_step(sigma, noisy_im_p, img_basic_p, n_W, k_W, N_W, p_W, tauMatch_W, useSD_W, tau_2D_W)
