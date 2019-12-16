@@ -1,50 +1,40 @@
 import numpy as np
 
 
-def get_transport_mat(im_s, k):
-    temp = np.zeros((im_s, (im_s - k + 1) * k), dtype=np.int)
-    for i in range(k):
-        temp[i, i] = 1
-    Trans = temp.copy()
-    for i in range(1, im_s - k + 1):
-        dT = np.roll(temp, i, axis=0)
-        dT = np.roll(dT, i * k, axis=1)
-        Trans += dT
-    return Trans
+def image2patches(im, patch_h, patch_w):
+    im_h, im_w = im.shape[0], im.shape[1]
+    patch_table = np.zeros((im_h - patch_h + 1, im_w - patch_w + 1, patch_h, patch_w), dtype=np.float64)
+    for i in range(im_h - patch_h + 1):
+        for j in range(im_w - patch_w + 1):
+            patch_table[i][j] = im[i:i + patch_h, j:j + patch_w]
 
-
-def image2patches(im, k, p):
-    '''
-    :param im:
-    :param k: patch size
-    :param p: step
-    :return:
-    '''
-    assert im.ndim == 2
-    assert im.shape[0] == im.shape[1]
-    im_s = im.shape[0]
-
-    Trans = get_transport_mat(im_s, k)
-    repetition = Trans.T @ im @ Trans
-    repetition = repetition.reshape((im_s - k + 1, k, im_s - k + 1, k))
-    repetition = repetition.transpose((0, 2, 1, 3))
-    repetition = repetition.reshape((-1, k, k))
-    return repetition
+    return patch_table
 
 
 if __name__ == '__main__':
     import cv2
+    from utils import ind_initialize
 
-    im = cv2.imread('Cameraman256.png', cv2.IMREAD_GRAYSCALE)
-    for i in range(100):
-        im[i, i] = 0
-        im[i, i + 50] = 0
-        im[i, i + 100] = 0
-        im[i, i + 150] = 0
-    cv2.imshow('im', im)
+    im = cv2.imread('test_data/image/Cameraman.png', cv2.IMREAD_GRAYSCALE)
+    height, width = im.shape[0], im.shape[1]
 
     k = 8
-    res = image2patches(im, k)
+    n = 16
+    p = 3
+
+    # row_ind = ind_initialize(height - k + 1, n, p)
+    # column_ind = ind_initialize(width - k + 1, n, p)
+    # im = cv2.resize(im, (512, 512))
+    # for i in range(100):
+    #     im[i, i] = 0
+    #     im[i, i + 50] = 0
+    #     im[i, i + 100] = 0
+    #     im[i, i + 150] = 0
+    # cv2.imshow('im', im)
+
+    res = image2patches(im, 8, 8)
+    print()
+    # res = image2patches_v1(im, k, 0)
     # for i in range(res.shape[0]):
     #     for j in range(res.shape[1]):
     #         cv2.imshow('patches', res[i, j].astype(np.uint8))

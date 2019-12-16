@@ -22,17 +22,14 @@ def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, tauMa
     group_3D_table = np.zeros((group_len, kWien, kWien))
     weight_table = np.zeros((height, width))
 
-    noisy_patches = image2patches(img_noisy, k=kWien, p=pWien)  # i_j_ipatch_jpatch__v
-    basic_patches = image2patches(img_basic, k=kWien, p=pWien)  # i_j_ipatch_jpatch__v
+    noisy_patches = image2patches(img_noisy, kWien, kWien)  # i_j_ipatch_jpatch__v
+    basic_patches = image2patches(img_basic, kWien, kWien)  # i_j_ipatch_jpatch__v
     if tau_2D == 'DCT':
         fre_noisy_patches = dct_2d_forward(noisy_patches)
         fre_basic_patches = dct_2d_forward(basic_patches)
     else:  # 'BIOR'
         fre_noisy_patches = bior_2d_forward(noisy_patches)
         fre_basic_patches = bior_2d_forward(basic_patches)
-
-    fre_noisy_patches = fre_noisy_patches.reshape((height - kWien + 1, height - kWien + 1, kWien, kWien))
-    fre_basic_patches = fre_basic_patches.reshape((height - kWien + 1, height - kWien + 1, kWien, kWien))
 
     acc_pointer = 0
     for i_r in row_ind:
