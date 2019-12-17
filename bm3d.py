@@ -61,10 +61,7 @@ if __name__ == '__main__':
             im_path = os.path.join(im_dir, im_name)
             im = cv2.imread(im_path, cv2.IMREAD_GRAYSCALE)
             noisy_im_path = os.path.join(noisy_dir, im_name)
-            # noisy_im = cv2.imread(noisy_im_path, cv2.IMREAD_GRAYSCALE)
-            
-            im = cv2.resize(im, (135, 267))
-            noisy_im = add_gaussian_noise(im, 20)
+            noisy_im = cv2.imread(noisy_im_path, cv2.IMREAD_GRAYSCALE)
 
             im1, im2 = run_bm3d(noisy_im, sigma,
                                 n_H, k_H, N_H, p_H, tauMatch_H, useSD_H, tau_2D_H, lambda3D_H,
