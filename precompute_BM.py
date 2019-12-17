@@ -7,7 +7,7 @@ def precompute_BM(img, kHW, NHW, nHW, tauMatch):
     Ns = 2 * nHW + 1
     threshold = tauMatch * kHW * kHW
     sum_table = np.ones((Ns, Ns, height, width)) * 2 * threshold  # di, dj, ph, pw
-    add_mat = get_add_patch_matrix(width, nHW, kHW)
+    row_add_mat, column_add_mat = get_add_patch_matrix(height, width, nHW, kHW)
     diff_margin = np.pad(np.ones((height - 2 * nHW, width - 2 * nHW)), nHW, 'constant', constant_values=0.)
     sum_margin = (1 - diff_margin) * 2 * threshold
 
@@ -16,7 +16,7 @@ def precompute_BM(img, kHW, NHW, nHW, tauMatch):
             t_img = translation_2d_mat(img, right=-dj, down=-di)
             diff_table_2 = (img - t_img) * (img - t_img) * diff_margin
 
-            sum_diff_2 = add_mat @ diff_table_2 @ add_mat.T
+            sum_diff_2 = row_add_mat @ diff_table_2 @ column_add_mat
             sum_table[di + nHW, dj + nHW] = np.maximum(sum_diff_2, sum_margin)  # sum_table (2n+1, 2n+1, height, width)
 
     sum_table = sum_table.reshape((Ns * Ns, height * width))  # di_dj, ph_pw
@@ -37,19 +37,20 @@ def precompute_BM(img, kHW, NHW, nHW, tauMatch):
     return ri_rj_N__ni_nj, threshold_count
 
 
-def get_add_patch_matrix(n, nHW, kHW):
-    """
-    :param n: len of mat
-    :param nHW: len of search area
-    :param kHW: len of patch
-    :return: manipulate mat
-    """
-    mat = np.eye(n - 2 * nHW)
-    mat = np.pad(mat, nHW, 'constant')
-    res_mat = mat.copy()
+def get_add_patch_matrix(h, w, nHW, kHW):
+    row_add = np.eye(h - 2 * nHW)
+    row_add = np.pad(row_add, nHW, 'constant')
+    row_add_mat = row_add.copy()
     for k in range(1, kHW):
-        res_mat += translation_2d_mat(mat, right=k, down=0)
-    return res_mat
+        row_add_mat += translation_2d_mat(row_add, right=k, down=0)
+
+    column_add = np.eye(w - 2 * nHW)
+    column_add = np.pad(column_add, nHW, 'constant')
+    column_add_mat = column_add.copy()
+    for k in range(1, kHW):
+        column_add_mat += translation_2d_mat(column_add, right=0, down=k)
+
+    return row_add_mat, column_add_mat
 
 
 def translation_2d_mat(mat, right, down):
@@ -72,7 +73,8 @@ if __name__ == '__main__':
     from utils import add_gaussian_noise, symetrize
 
     # <hyper parameter>
-    ref_i, ref_j = 196, 142
+    # ref_i, ref_j = 196, 142
+    ref_i, ref_j = 164, 135
     # ref_i, ref_j = 271, 206
 
     kHW = 8
@@ -82,6 +84,8 @@ if __name__ == '__main__':
     # <hyper parameter \>
 
     im = cv2.imread('test_data/image/Cameraman.png', cv2.IMREAD_GRAYSCALE)
+    im = im[100:, :]
+    ref_i, ref_j = 64, 135
     im_noisy = add_gaussian_noise(im, 10, seed=1)
 
     img_noisy_p = symetrize(im_noisy, nHW)
