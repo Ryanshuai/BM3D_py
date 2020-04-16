@@ -3,6 +3,14 @@ from scipy.linalg import hadamard
 
 
 def wiener_filtering_hadamard(group_3D_img, group_3D_est, sigma, doWeight):
+    """
+    :wiener_filtering after hadamard transform
+    :param group_3D_img:
+    :param group_3D_est:
+    :param sigma:
+    :param doWeight:
+    :return:
+    """
     assert group_3D_img.shape == group_3D_est.shape
     nSx_r = group_3D_img.shape[-1]
     coef = 1.0 / nSx_r
@@ -10,6 +18,7 @@ def wiener_filtering_hadamard(group_3D_img, group_3D_est, sigma, doWeight):
     group_3D_img_h = hadamard_transform(group_3D_img)  # along nSx_r axis
     group_3D_est_h = hadamard_transform(group_3D_est)
 
+    # wiener filtering in this block
     value = np.power(group_3D_est_h, 2) * coef
     value /= (value + sigma * sigma)
     group_3D_est_h = group_3D_img_h * value * coef

@@ -2,6 +2,13 @@ import numpy as np
 
 
 def image2patches(im, patch_h, patch_w):
+    """
+    :cut the image into patches
+    :param im:
+    :param patch_h:
+    :param patch_w:
+    :return:
+    """
     im_h, im_w = im.shape[0], im.shape[1]
     patch_table = np.zeros((im_h - patch_h + 1, im_w - patch_w + 1, patch_h, patch_w), dtype=np.float64)
     for i in range(im_h - patch_h + 1):

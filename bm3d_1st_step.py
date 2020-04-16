@@ -59,6 +59,7 @@ def bm3d_1st_step(sigma, img_noisy, nHard, kHard, NHard, pHard, lambdaHard3D, ta
     #     cv2.imshow('', patch.astype(np.uint8))
     #     cv2.waitKey()
 
+    # aggregation part
     numerator = np.zeros_like(img_noisy, dtype=np.float64)
     denominator = np.zeros((img_noisy.shape[0] - 2 * nHard, img_noisy.shape[1] - 2 * nHard), dtype=np.float64)
     denominator = np.pad(denominator, nHard, 'constant', constant_values=1.)

@@ -4,12 +4,21 @@ import math
 
 
 def ht_filtering_hadamard(group_3D, sigma, lambdaHard3D, doWeight):  # group_3D shape=(n*n, nSx_r)
+    """
+    :hard threshold filtering after hadamard transform
+    :param group_3D:
+    :param sigma:
+    :param lambdaHard3D:
+    :param doWeight:
+    :return:
+    """
     nSx_r = group_3D.shape[-1]
     coef_norm = math.sqrt(nSx_r)
     coef = 1.0 / nSx_r
 
     group_3D_h = hadamard_transform(group_3D)
 
+    # hard threshold filtering in this block
     T = lambdaHard3D * sigma * coef_norm
     T_3D = np.where(np.abs(group_3D_h) > T, 1, 0)
     weight = np.sum(T_3D)

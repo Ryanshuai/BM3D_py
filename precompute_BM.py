@@ -2,6 +2,16 @@ import numpy as np
 
 
 def precompute_BM(img, kHW, NHW, nHW, tauMatch):
+    """
+    :search for similar patches
+    :param img: input image
+    :param kHW: length of side of patch
+    :param NHW: how many patches are stacked
+    :param nHW: length of side of search area
+    :param tauMatch: threshold determine whether two patches are similar
+    :return ri_rj_N__ni_nj: The top N most similar patches to the referred patch
+    :return threshold_count: according to tauMatch how many patches are similar to the referred one
+    """
     img = img.astype(np.float64)
     height, width = img.shape
     Ns = 2 * nHW + 1

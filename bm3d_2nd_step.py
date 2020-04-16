@@ -60,6 +60,7 @@ def bm3d_2nd_step(sigma, img_noisy, img_basic, nWien, kWien, NWien, pWien, tauMa
     #     cv2.imshow('', patch.astype(np.uint8))
     #     cv2.waitKey()
 
+    # aggregation part
     numerator = np.zeros_like(img_noisy, dtype=np.float64)
     denominator = np.zeros((img_noisy.shape[0] - 2 * nWien, img_noisy.shape[1] - 2 * nWien), dtype=np.float64)
     denominator = np.pad(denominator, nWien, 'constant', constant_values=1.)

@@ -4,6 +4,11 @@ import numpy as np
 
 
 def bior_2d_forward(img):
+    """
+    :wavelet forward transform
+    :param bior_img:
+    :return:
+    """
     assert img.shape[-1] == img.shape[-2]
     iter_max = int(math.log2(img.shape[-1]))
 
@@ -21,6 +26,11 @@ def bior_2d_forward(img):
 
 
 def bior_2d_reverse(bior_img):
+    """
+    :wavelet reverse transform
+    :param bior_img:
+    :return:
+    """
     assert bior_img.shape[-1] == bior_img.shape[-2]
     iter_max = int(math.log2(bior_img.shape[-1]))
 
