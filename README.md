@@ -9,7 +9,7 @@ We refer to this [CPP](https://www.ipol.im/pub/art/2012/l-bm3d/) version.
 2. Quickly develop a new algorithm based on BM3D.
 
 ### Thanks to
-&nbsp;&nbsp;&nbsp; This repository is guided by [Professor Yuxiang Wang](https://sites.cs.ucsb.edu/~yuxiangw/).
+&nbsp;&nbsp;&nbsp; This repository is guided by [Professor Yu-Xiang Wang](https://sites.cs.ucsb.edu/~yuxiangw/).
 
 ### Comparison of CPP version and Python version
 
